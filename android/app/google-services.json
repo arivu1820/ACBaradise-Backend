@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "813682247245",
+    "project_id": "ac-baradise-1969",
+    "storage_bucket": "ac-baradise-1969.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:813682247245:android:5dac02160f6ce2352f7e04",
+        "android_client_info": {
+          "package_name": "com.acb.acbaradise"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "813682247245-1bvladq1ic1qhf2oc6g81pk898o6v551.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB4V5EJrXiwQs5WiKM0m5c2Rrk3g5hYgis"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "813682247245-1bvladq1ic1qhf2oc6g81pk898o6v551.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
