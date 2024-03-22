@@ -1,5 +1,4 @@
-
-import 'package:acbaradise/Widgets/CombinedWidgets/PaymentMethod.dart';
+import 'package:acbaradise/Screens/OrdersScreen.dart';
 import 'package:acbaradise/Widgets/SingleWidgets/AppbarWithCart.dart';
 import 'package:acbaradise/Widgets/SingleWidgets/CommonBtn.dart';
 import 'package:acbaradise/Widgets/SingleWidgets/SimplyExpand.dart';
@@ -7,6 +6,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import "package:acbaradise/Theme/Colors.dart";
 import 'package:acbaradise/Widgets/CombinedWidgets/CashonDelivery.dart';
+import 'package:razorpay_flutter/razorpay_flutter.dart';
 import 'package:uuid/uuid.dart';
 
 class PaymentScreen extends StatefulWidget {
@@ -29,45 +29,267 @@ class PaymentScreen extends StatefulWidget {
 
 class _PaymentScreenState extends State<PaymentScreen> {
   bool isCashOnDeliverySelected = false;
+  bool issubmited = false;
+  String name = '';
+  String email = '';
+  String address = '';
+  String contact = '';
+  String latitude = '';
+  String longitude = '';
+  String orderTitle = '';
+
+  final Razorpay _razorpay = Razorpay();
+
+  @override
+  void initState() {
+    super.initState();
+    //  final Razorpay _razorpay = Razorpay();
+    // To handle different events with previous functions
+    _razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
+    _razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
+    _razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET, _handleExternalWallet);
+  }
+
+  void openCheckout(num totalamount) async {
+    totalamount = totalamount * 100;
+    var options = {
+      // Razorpay API Key
+      'key': 'rzp_test_bEVQhaC3E9rBPZ',
+      // in the smallest
+      // currency sub-unit.
+      'amount': totalamount,
+      "currency": "INR",
+      // 'name': 'AC Baradise',
+      // Generate order_id
+      // using Orders API
+      // 'order_id': 'adfasdfasddsa',
+      // Order Description to be
+      // shown in razor pay page
+      'description': 'order id',
+      // in seconds
+      'timeout': 300,
+      // in seconds
+      'prefill': {
+        'contact': contact,
+        'email': email,
+        'name': name,
+        'address': address,
+      } // contact number and email id of user
+    };
+    try {
+      _razorpay.open(options);
+    } catch (e) {
+      debugPrint('error...............................................');
+    }
+  }
+
+  Future<void> _handlePaymentSuccess(PaymentSuccessResponse response) async {
+    await placeOrder();
+
+    const snackDemo = SnackBar(
+      content: Text("Your Order Placed Successfully"),
+      backgroundColor: leghtGreen,
+      elevation: 10,
+      behavior: SnackBarBehavior.floating,
+      margin: EdgeInsets.all(5),
+      duration: Duration(seconds: 3),
+    );
+    ScaffoldMessenger.of(context).removeCurrentSnackBar();
+    ScaffoldMessenger.of(context).showSnackBar(snackDemo);
+    removeAllCarts(widget.uid);
+    Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => OrdersScreen(uid: widget.uid),
+        ));
+        setState(() {
+                                issubmited = false;
+                              });
+    print("All products are available. Proceeding with the order.");
+  }
+
+  void _handlePaymentError(PaymentFailureResponse response) {
+    setState(() {
+                                issubmited = false;
+                              });
+    const snackDemo = SnackBar(
+      content: Text("Payment failed. Please try again."),
+      backgroundColor: brownColor,
+      elevation: 10,
+      behavior: SnackBarBehavior.floating,
+      margin: EdgeInsets.all(5),
+      duration: Duration(seconds: 3),
+    );
+    ScaffoldMessenger.of(context).removeCurrentSnackBar();
+    ScaffoldMessenger.of(context).showSnackBar(snackDemo);
+
+    // Do something when payment fails
+  }
+
+  void _handleExternalWallet(ExternalWalletResponse response) {
+    const snackDemo = SnackBar(
+      content: Text("External wallet selected."),
+      backgroundColor: darkBlueColor,
+      elevation: 10,
+      behavior: SnackBarBehavior.floating,
+      margin: EdgeInsets.all(5),
+      duration: Duration(seconds: 3),
+    );
+    ScaffoldMessenger.of(context).removeCurrentSnackBar();
+    ScaffoldMessenger.of(context).showSnackBar(snackDemo);
+
+    // Do something when an external wallet is selected
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        title: Text("Payment"),
-        // You may replace this with your custom AppbarWithCart widget
-      ),
-      body: Column(
-        children: [
-          CashonDelivery(
-            onSelectionChanged: (isSelected) {
-              setState(() {
-                isCashOnDeliverySelected = isSelected;
-              });
-            },
-          ),
-          PaymentMethod(amount: widget.amount),
-          SimplyExpand(),
-          CommonBtn(
-            BtnName: "Confirm order to Proceed",
-            function: () async {
-              bool allProductsAvailable = await forproduct();
+      backgroundColor: whiteColor,
+      appBar:
+          AppbarWithCart(PageName: 'Payment', iscart: false, uid: widget.uid),
+      // You may replace this with your custom AppbarWithCart widget
 
-              if (allProductsAvailable) {
-                await placeOrder();
-
-                print("All products are available. Proceeding with the order.");
-              } else {
-                print(
-                    "Not all products are available. Order cannot be processed.");
-              }
-            },
-            isSelected: isCashOnDeliverySelected,
-          ),
-        ],
-      ),
+      body: issubmited
+          ? Center(
+              child: const CircularProgressIndicator(
+              color: darkBlueColor,
+              strokeWidth: 2,
+            ))
+          : Column(
+              children: [
+                if (widget.amount < 1000)
+                  CashonDelivery(
+                    onSelectionChanged: (isSelected) {
+                      setState(() {
+                        isCashOnDeliverySelected = isSelected;
+                      });
+                    },
+                  ),
+                Container(
+                  padding: const EdgeInsets.only(
+                      left: 30, top: 30, bottom: 30, right: 20),
+                  decoration: const BoxDecoration(
+                    border: Border(
+                      bottom: BorderSide(
+                        color: lightBlue30Color,
+                        width: 1.0,
+                      ),
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(5),
+                        decoration: BoxDecoration(
+                          border: Border.all(color: lightBlueColor),
+                          borderRadius: BorderRadius.circular(5.0),
+                        ),
+                        child: Image.asset(
+                          "Assets/Icons/Payment_method_icon.png",
+                          height: 40,
+                          width: 40,
+                        ),
+                      ),
+                      const SizedBox(width: 30),
+                      const Expanded(
+                        child: Text(
+                          "Pay Through Online",
+                          style: TextStyle(
+                            fontFamily: "OxygenRegular",
+                            fontSize: 16,
+                            color: blackColor,
+                          ),
+                        ),
+                      ),
+                      IconButton(
+                          onPressed: () async {
+                            setState(() {
+                              issubmited = true;
+                            });
+                            bool allProductsAvailable = await forproduct();
+                            if (allProductsAvailable) {
+                              openCheckout(widget.amount);
+                              
+                            } else {
+                              const snackDemo = SnackBar(
+                                content: Text("Remove Out of Stock Items"),
+                                backgroundColor: brownColor,
+                                elevation: 10,
+                                behavior: SnackBarBehavior.floating,
+                                margin: EdgeInsets.all(5),
+                                duration: Duration(seconds: 5),
+                              );
+                              ScaffoldMessenger.of(context)
+                                  .removeCurrentSnackBar();
+                              ScaffoldMessenger.of(context)
+                                  .showSnackBar(snackDemo);
+                              setState(() {
+                                issubmited = false;
+                              });
+                              print(
+                                  "Not all products are available. Order cannot be processed.");
+                            }
+                          },
+                          icon: Image.asset(
+                            "Assets/Icons/ArrowRight.png",
+                            height: 20,
+                            width: 10,
+                          ))
+                    ],
+                  ),
+                ),
+                SimplyExpand(),
+                CommonBtn(
+                  BtnName: "Confirm order to Proceed",
+                  function: () => callorderconfirm(),
+                  isSelected: isCashOnDeliverySelected,
+                ),
+              ],
+            ),
     );
+  }
+
+  Future<void> callorderconfirm() async {
+    setState(() {
+      issubmited = true;
+    });
+    bool allProductsAvailable = await forproduct();
+    if (allProductsAvailable) {
+      await placeOrder();
+
+      const snackDemo = SnackBar(
+        content: Text("Your Order Placed Successfully"),
+        backgroundColor: leghtGreen,
+        elevation: 10,
+        behavior: SnackBarBehavior.floating,
+        margin: EdgeInsets.all(5),
+        duration: Duration(seconds: 3),
+      );
+      ScaffoldMessenger.of(context).removeCurrentSnackBar();
+      ScaffoldMessenger.of(context).showSnackBar(snackDemo);
+      removeAllCarts(widget.uid);
+      Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => OrdersScreen(uid: widget.uid),
+          ));
+      print("All products are available. Proceeding with the order.");
+    } else {
+      const snackDemo = SnackBar(
+        content: Text("Remove Out of Stock Items"),
+        backgroundColor: brownColor,
+        elevation: 10,
+        behavior: SnackBarBehavior.floating,
+        margin: EdgeInsets.all(5),
+        duration: Duration(seconds: 5),
+      );
+      ScaffoldMessenger.of(context).removeCurrentSnackBar();
+      ScaffoldMessenger.of(context).showSnackBar(snackDemo);
+      setState(() {
+        issubmited = false;
+      });
+      print("Not all products are available. Order cannot be processed.");
+    }
   }
 
   Future<bool> forproduct() async {
@@ -77,12 +299,6 @@ class _PaymentScreenState extends State<PaymentScreen> {
         widget.allincart['generalproductlist'];
 
     for (var productData in productDataList) {
-      print("Product ID: ${productData['productId']}");
-      print("Category ID: ${productData['docId']}");
-      print("Product Data: ${productData['productData']}");
-      print("Count: ${productData['count']}");
-      print("-------------------------------");
-
       bool stockAvailable = await checkStockAvailability(
           productData['productId'], productData['count']);
 
@@ -93,12 +309,6 @@ class _PaymentScreenState extends State<PaymentScreen> {
     }
 
     for (var productData in generalproductDataList) {
-      print("Product ID: ${productData['productId']}");
-      print("Category ID: ${productData['docId']}");
-      print("Product Data: ${productData['productData']}");
-      print("Count: ${productData['count']}");
-      print("-------------------------------");
-
       bool stockAvailable = await generalcheckStockAvailability(
           productData['productId'], productData['count']);
 
@@ -167,22 +377,69 @@ class _PaymentScreenState extends State<PaymentScreen> {
     return true;
   }
 
+  Future<void> removeAllCarts(String userId) async {
+    try {
+      // Remove AMCCart coll
+      await _deleteCollection(FirebaseFirestore.instance
+          .collection('Users')
+          .doc(userId)
+          .collection('GeneralProductsCart'));
+
+      await _deleteCollection(FirebaseFirestore.instance
+          .collection('Users')
+          .doc(userId)
+          .collection('AMCCart'));
+
+      // Remove ServicesCart collection
+      await _deleteCollection(FirebaseFirestore.instance
+          .collection('Users')
+          .doc(userId)
+          .collection('ServicesCart'));
+
+      // Remove GeneralProductsCart collection
+      await _deleteCollection(FirebaseFirestore.instance
+          .collection('Users')
+          .doc(userId)
+          .collection('ProductsCart'));
+
+      print("All carts removed for user $userId.");
+    } catch (e) {
+      print("Error removing carts: $e");
+    }
+  }
+
+  Future<void> _deleteCollection(CollectionReference collectionRef) async {
+    try {
+      QuerySnapshot snapshot = await collectionRef.get();
+
+      for (DocumentSnapshot doc in snapshot.docs) {
+        await doc.reference.delete();
+      }
+    } catch (e) {
+      print("Error deleting collection: $e");
+    }
+  }
+
   Map<String, dynamic> productorderdetail() {
     List<Map<String, dynamic>> productDataList =
         widget.allincart['productdatalist'];
     List<Map<String, dynamic>> orderproductdetail = [];
 
     for (var productData in productDataList) {
-      print("Product ID: ${productData['productId']}");
-      print("Category ID: ${productData['docId']}");
-      print("Product Data: ${productData['productData']}");
-      print("Count: ${productData['count']}");
-
       // Get necessary data from productData
       String productId = productData['productId'];
       String categoryId = productData['docId'];
       int count = productData['count'];
+      if (count <= 0) {
+        continue;
+      }
       String title = productData['productData']['Name'];
+if (orderTitle=='') {
+    orderTitle = title;
+} else {
+    orderTitle = orderTitle + ', ' + title;
+}
+
       String img = productData['productData']['Images'][0];
       num discount = productData['productData']['Discount'] ?? 0;
       num mrp = productData['productData']['MRP'] ?? 0;
@@ -233,15 +490,18 @@ class _PaymentScreenState extends State<PaymentScreen> {
     List<Map<String, dynamic>> orderproductdetail = [];
 
     for (var productData in productDataList) {
-      print("Product ID: ${productData['productId']}");
-      print("Category ID: ${productData['docId']}");
-      print("Product Data: ${productData['productData']}");
-      print("Count: ${productData['count']}");
-
       // Get necessary data from productData
       String productId = productData['productId'];
       int count = productData['count'];
+      if (count <= 0) {
+        continue;
+      }
       String title = productData['productData']['Name'];
+if (orderTitle=='') {
+    orderTitle = title;
+} else {
+    orderTitle = orderTitle + ', ' + title;
+}
       String img = productData['productData']['Image'];
       num discount = productData['productData']['Discount'] ?? 0;
       num mrp = productData['productData']['MRP'] ?? 0;
@@ -291,17 +551,19 @@ class _PaymentScreenState extends State<PaymentScreen> {
     List<Map<String, dynamic>> orderproductdetail = [];
 
     for (var productData in productDataList) {
-      print("Product ID: ${productData['productId']}");
-      print("Category ID: ${productData['collectionName']}");
-      print("Product Data: ${productData['productData']}");
-      print("Count: ${productData['count']}");
-
       bool isYes = productData['is360degree'] ?? false;
       String productId = productData['productId'];
       String categoryId = productData['collectionName'];
       int count = productData['count'];
+      if (count <= 0) {
+        continue;
+      }
       String title = productData['productData']['Title'];
-      // String img = productData['productData']['Image'];
+if (orderTitle=='') {
+    orderTitle = title;
+} else {
+    orderTitle = orderTitle + ', ' + title;
+}
       num discount = productData['productData']['Discount'] ?? 0;
       num mrp = productData['productData']['MRP'] ?? 0;
       num is360degreeprice = productData['productData']['Wash360Price'] ?? 0;
@@ -354,18 +616,23 @@ class _PaymentScreenState extends State<PaymentScreen> {
     List<Map<String, dynamic>> orderProductDetail = [];
 
     for (var productData in productDataList) {
-      print(".............");
-      print("Product ID: ${productData['productId']}");
-      print("Category ID: ${productData['collectionName']}");
-      print("Product Data: ${productData['productData']}");
-      print("Count: ${productData['count']}");
-
       String productId = productData['productId'];
       // Assuming 'collectionName' is still relevant for AMC, adjust if needed
       String categoryId = productData['collectionName'];
       int count = productData['count'];
+
+      if (count <= 0) {
+        continue;
+      }
+
       bool isYes = productData['UseTotalSpares'];
       String title = productData['productData']['Content']['Title'];
+if (orderTitle=='') {
+    orderTitle = title;
+} else {
+    orderTitle = orderTitle + ', ' + title;
+}
+
       List benefits = productData['productData']['Content']['Benefits'];
       List images = productData['productData']['Content']['Images'];
 
@@ -413,11 +680,6 @@ class _PaymentScreenState extends State<PaymentScreen> {
   }
 
   Future<void> placeOrder() async {
-    String name = '';
-    String email = '';
-    String address = '';
-    String contact = '';
-
     Map<String, dynamic> product = await productorderdetail();
     Map<String, dynamic> service = await serviceorderdetail();
     Map<String, dynamic> amc = await amcorderdetail();
@@ -458,20 +720,28 @@ class _PaymentScreenState extends State<PaymentScreen> {
             // Get other fields from the document
             String street = addedAddressDoc['BuildingStreet'];
             String building = addedAddressDoc['HouseNoFloor'];
+
             String LandmarkAreaName = addedAddressDoc['LandmarkAreaName'];
+            String pincode = addedAddressDoc['Pincode'];
+
             contact = addedAddressDoc['Contact'];
+            latitude = addedAddressDoc['Latitude'].toString();
+
+            longitude = addedAddressDoc['Longitude'].toString();
 
             // Add more fields as needed...
 
             // Concatenate fields into the address string
             address =
-                '$building ,$street, $LandmarkAreaName'; // Adjust the format as needed
+                '$building ,$street, $LandmarkAreaName, $pincode'; // Adjust the format as needed
 
             // If 'isSelected' is true, exit the loop
             break;
           }
         }
       }
+      await reduceStockForProduct(widget.uid, product);
+      await reduceStockForGeneralProduct(widget.uid, generalproduct);
       await FirebaseFirestore.instance
           .collection('Users')
           .doc(widget.uid)
@@ -482,9 +752,12 @@ class _PaymentScreenState extends State<PaymentScreen> {
         'CreatedAt': Timestamp.now(),
         'email': email,
         'name': name,
+        'lat': latitude,
+        'lon': longitude,
         'address': address,
         'contact': contact,
         'totalamount': widget.amount,
+        'orderTitle': orderTitle,
       });
 
       await storeAMCDataInFirestore(widget.uid);
@@ -559,5 +832,87 @@ class _PaymentScreenState extends State<PaymentScreen> {
         dateTime.second,
         dateTime.millisecond,
         dateTime.microsecond);
+  }
+
+  Future<void> reduceStockForProduct(
+      String userId, Map<String, dynamic> product) async {
+    List<Map<String, dynamic>> productDataList =
+        widget.allincart['productdatalist'];
+
+    for (var productData in productDataList) {
+      String productId = productData['productId'];
+      int count = productData['count'];
+
+      await updateProductStock(userId, productId, count);
+    }
+  }
+
+  Future<void> reduceStockForGeneralProduct(
+      String userId, Map<String, dynamic> generalproduct) async {
+    List<Map<String, dynamic>> generalproductDataList =
+        widget.allincart['generalproductlist'];
+
+    for (var productData in generalproductDataList) {
+      String productId = productData['productId'];
+      int count = productData['count'];
+
+      await updateGeneralProductStock(userId, productId, count);
+    }
+  }
+
+  Future<void> updateProductStock(
+      String userId, String productId, int count) async {
+    QuerySnapshot productsSnapshot =
+        await FirebaseFirestore.instance.collection('Categories').get();
+
+    for (var categoryDoc in productsSnapshot.docs) {
+      String categoryId = categoryDoc.id;
+
+      DocumentReference productDocRef = FirebaseFirestore.instance
+          .collection('Categories')
+          .doc(categoryId)
+          .collection('Products')
+          .doc(productId);
+
+      DocumentSnapshot productDoc = await productDocRef.get();
+
+      if (productDoc.exists) {
+        int currentStock = productDoc['Stock'] ?? 0;
+        int newStock = currentStock - count;
+        if (newStock < 0) {
+          newStock = 0; // Ensure stock doesn't go negative
+        }
+
+        // Update stock in Firestore
+        await productDocRef.update({'Stock': newStock});
+      }
+    }
+  }
+
+  Future<void> updateGeneralProductStock(
+      String userId, String productId, int count) async {
+    try {
+      // Get the reference to the product document
+      DocumentReference productDocRef = FirebaseFirestore.instance
+          .collection('GeneralProducts')
+          .doc(productId);
+
+      // Get the current stock of the product
+      DocumentSnapshot productDoc = await productDocRef.get();
+      if (productDoc.exists) {
+        int currentStock = productDoc['Stock'] ?? 0;
+
+        // Calculate new stock value after reducing the count
+        int newStock = currentStock - count;
+        if (newStock < 0) {
+          newStock = 0; // Ensure stock doesn't go negative
+        }
+
+        // Update stock in Firestore
+        await productDocRef.update({'Stock': newStock});
+      }
+    } catch (error) {
+      print('Error updating general product stock: $error');
+    }
   }
 }

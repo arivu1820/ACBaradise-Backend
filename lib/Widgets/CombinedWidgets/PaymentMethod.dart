@@ -5,8 +5,8 @@ import 'package:razorpay_flutter/razorpay_flutter.dart';
 
 class PaymentMethod extends StatefulWidget {
   final num amount;
-  PaymentMethod({Key? key,required this.amount});
   
+  PaymentMethod({Key? key, required this.amount});
 
   @override
   State<PaymentMethod> createState() => _PaymentMethodState();
@@ -17,11 +17,10 @@ class _PaymentMethodState extends State<PaymentMethod> {
 
   // final razorpaykey = dotenv.get('rzp_test_bEVQhaC3E9rBPZ');
 
-
   @override
   void initState() {
     super.initState();
-  //  final Razorpay _razorpay = Razorpay();
+    //  final Razorpay _razorpay = Razorpay();
     // To handle different events with previous functions
     _razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
     _razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
@@ -37,16 +36,16 @@ class _PaymentMethodState extends State<PaymentMethod> {
       // currency sub-unit.
       'amount': totalamount,
       "currency": "INR",
-      // 'name': 'AC Baradise', 
-          // Generate order_id  
-          // using Orders API 
-          // 'order_id': 'adfasdfasddsa',  
-          // Order Description to be  
-          // shown in razor pay page 
-          'description': 
-              'order id',  
-          // in seconds 
-          'timeout': 300, 
+      'name': 'AC Baradise',
+      // Generate order_id
+      // using Orders API
+      // 'order_id': 'adfasdfasddsa',
+      // Order Description to be
+      // shown in razor pay page
+      'description':
+          'order id',
+      // in seconds
+      'timeout': 300,
       // in seconds
       'prefill': {
         'contact': '9123456789',
@@ -60,52 +59,50 @@ class _PaymentMethodState extends State<PaymentMethod> {
     }
   }
 
-Future<void> _handlePaymentSuccess(PaymentSuccessResponse response) async {
-    await Future.delayed(Duration(seconds: 6));
+  Future<void> _handlePaymentSuccess(PaymentSuccessResponse response) async {
 
-  const snackDemo = SnackBar(
-    content: Text("Payment successful!"),
-    backgroundColor: leghtGreen,
-    elevation: 10,
-    behavior: SnackBarBehavior.floating,
-    margin: EdgeInsets.all(5),
-    duration: Duration(seconds: 3),
-  );
-  ScaffoldMessenger.of(context).removeCurrentSnackBar();
-  ScaffoldMessenger.of(context).showSnackBar(snackDemo);
-}
+    const snackDemo = SnackBar(
+      content: Text("Payment successful!"),
+      backgroundColor: leghtGreen,
+      elevation: 10,
+      behavior: SnackBarBehavior.floating,
+      margin: EdgeInsets.all(5),
+      duration: Duration(seconds: 3),
+    );
+    ScaffoldMessenger.of(context).removeCurrentSnackBar();
+    ScaffoldMessenger.of(context).showSnackBar(snackDemo);
+  }
 
-void _handlePaymentError(PaymentFailureResponse response) {
-  // Navigator.of(context).pop();
-  const snackDemo = SnackBar(
-    content: Text("Payment failed. Please try again."),
-    backgroundColor: brownColor,
-    elevation: 10,
-    behavior: SnackBarBehavior.floating,
-    margin: EdgeInsets.all(5),
-    duration: Duration(seconds: 3),
-  );
-  ScaffoldMessenger.of(context).removeCurrentSnackBar();
-  ScaffoldMessenger.of(context).showSnackBar(snackDemo);
+  void _handlePaymentError(PaymentFailureResponse response) {
+    // Navigator.of(context).pop();
+    const snackDemo = SnackBar(
+      content: Text("Payment failed. Please try again."),
+      backgroundColor: brownColor,
+      elevation: 10,
+      behavior: SnackBarBehavior.floating,
+      margin: EdgeInsets.all(5),
+      duration: Duration(seconds: 3),
+    );
+    ScaffoldMessenger.of(context).removeCurrentSnackBar();
+    ScaffoldMessenger.of(context).showSnackBar(snackDemo);
 
-  // Do something when payment fails
-}
+    // Do something when payment fails
+  }
 
-void _handleExternalWallet(ExternalWalletResponse response) {
-  const snackDemo = SnackBar(
-    content: Text("External wallet selected."),
-    backgroundColor: darkBlueColor,
-    elevation: 10,
-    behavior: SnackBarBehavior.floating,
-    margin: EdgeInsets.all(5),
-    duration: Duration(seconds: 3),
-  );
-  ScaffoldMessenger.of(context).removeCurrentSnackBar();
-  ScaffoldMessenger.of(context).showSnackBar(snackDemo);
+  void _handleExternalWallet(ExternalWalletResponse response) {
+    const snackDemo = SnackBar(
+      content: Text("External wallet selected."),
+      backgroundColor: darkBlueColor,
+      elevation: 10,
+      behavior: SnackBarBehavior.floating,
+      margin: EdgeInsets.all(5),
+      duration: Duration(seconds: 3),
+    );
+    ScaffoldMessenger.of(context).removeCurrentSnackBar();
+    ScaffoldMessenger.of(context).showSnackBar(snackDemo);
 
-  // Do something when an external wallet is selected
-}
-
+    // Do something when an external wallet is selected
+  }
 
   // @override
   // void dispose() {
@@ -152,7 +149,11 @@ void _handleExternalWallet(ExternalWalletResponse response) {
           ),
           IconButton(
               onPressed: () {
-                openCheckout(widget.amount);
+                print(widget.amount.runtimeType);
+                print(
+                    '....................................................................................');
+                num numm = widget.amount;
+                openCheckout(numm);
               },
               icon: Image.asset(
                 "Assets/Icons/ArrowRight.png",

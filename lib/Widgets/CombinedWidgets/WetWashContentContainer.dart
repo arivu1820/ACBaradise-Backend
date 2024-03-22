@@ -180,8 +180,8 @@ class _WetWashContentContainerState extends State<WetWashContentContainer> {
                           children: [
                             TextSpan(
                               text: isSelected
-                                  ? '₹ ${NumberFormat('#,##,###').format(((widget.mrp+ widget.wash360mrp) - ((widget.mrp+ widget.wash360mrp) * widget.discount / 100)) )}  '
-                                  : '₹ ${NumberFormat('#,##,###').format((widget.mrp - (widget.mrp * widget.discount / 100)))}  ',
+                                  ? '₹ ${NumberFormat('#,##,###').format(((widget.mrp+ widget.wash360mrp) - ((widget.mrp+ widget.wash360mrp) * widget.discount / 100)).ceilToDouble() )}  '
+                                  : '₹ ${NumberFormat('#,##,###').format((widget.mrp - (widget.mrp * widget.discount / 100)).ceilToDouble())}  ',
                               style: TextStyle(
                                 fontFamily: "LexendRegular",
                                 fontSize: 20,

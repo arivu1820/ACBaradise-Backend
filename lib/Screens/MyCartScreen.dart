@@ -2,6 +2,7 @@ import 'package:acbaradise/Models/CostContainerdatabase.dart';
 import 'package:acbaradise/Theme/Colors.dart';
 import 'package:acbaradise/Widgets/CombinedWidgets/AMCInCart.dart';
 import 'package:acbaradise/Widgets/CombinedWidgets/GeneralProductsInCart.dart';
+import 'package:acbaradise/Widgets/CombinedWidgets/PaymentMethod.dart';
 import 'package:acbaradise/Widgets/CombinedWidgets/ProductsInCart.dart';
 import 'package:acbaradise/Widgets/CombinedWidgets/ServicesInCard.dart';
 import 'package:acbaradise/Widgets/SingleWidgets/AppbarWithCart.dart';
@@ -32,7 +33,8 @@ class _MyCartScreenState extends State<MyCartScreen> {
 
     return Scaffold(
       backgroundColor: whiteColor,
-      appBar: AppbarWithCart(PageName: "My Cart", iscart: false, uid: widget.uid),
+      appBar:
+          AppbarWithCart(PageName: "My Cart", iscart: false, uid: widget.uid),
       body: progressbar
           ? CenterProgressBar()
           : Column(
@@ -71,7 +73,8 @@ class _MyCartScreenState extends State<MyCartScreen> {
 
                             if (productSnapshot.hasData &&
                                 productSnapshot.data!.docs.isNotEmpty) {
-                              return ProductsInCart(isQtyReq: false, uid: widget.uid);
+                              return ProductsInCart(
+                                  isQtyReq: false, uid: widget.uid);
                             } else {
                               return Container();
                             }
@@ -105,12 +108,15 @@ class _MyCartScreenState extends State<MyCartScreen> {
                               .collection('ServicesCart')
                               .snapshots(),
                           builder: (context, snapshot) {
-                            if (snapshot.connectionState == ConnectionState.waiting) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
                               return Center(child: CircularProgressIndicator());
                             }
 
-                            if (snapshot.hasData && snapshot.data!.docs.isNotEmpty) {
-                              return ServicesInCart(isQtyReq: false, uid: widget.uid);
+                            if (snapshot.hasData &&
+                                snapshot.data!.docs.isNotEmpty) {
+                              return ServicesInCart(
+                                  isQtyReq: false, uid: widget.uid);
                             } else {
                               return Container();
                             }
@@ -123,12 +129,15 @@ class _MyCartScreenState extends State<MyCartScreen> {
                               .collection('AMCCart')
                               .snapshots(),
                           builder: (context, snapshot) {
-                            if (snapshot.connectionState == ConnectionState.waiting) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
                               return Center(child: CircularProgressIndicator());
                             }
 
-                            if (snapshot.hasData && snapshot.data!.docs.isNotEmpty) {
-                              return AMCInCart(isQtyReq: false, uid: widget.uid);
+                            if (snapshot.hasData &&
+                                snapshot.data!.docs.isNotEmpty) {
+                              return AMCInCart(
+                                  isQtyReq: false, uid: widget.uid);
                             } else {
                               return Container();
                             }
@@ -163,7 +172,8 @@ class CostContainerSection extends StatelessWidget {
       children: [
         Container(
           padding: const EdgeInsets.all(20),
-          margin: const EdgeInsets.only(left: 20, right: 20, top: 20, bottom: 150),
+          margin:
+              const EdgeInsets.only(left: 20, right: 20, top: 20, bottom: 150),
           width: double.infinity,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(5),
@@ -191,7 +201,7 @@ class CostContainerSection extends StatelessWidget {
                 color: lightGrayColor,
               ),
               const SizedBox(height: 10),
-              ToPayDetails(uid:uid),
+              ToPayDetails(uid: uid),
             ],
           ),
         ),
@@ -215,7 +225,8 @@ class ProductCartDetails extends StatelessWidget {
           .snapshots(),
       builder: (context, snapshot) {
         if (snapshot.hasError) {
-          return Text('Some Problem occur please try after sometime!',
+          return Text(
+            'Some Problem occur please try after sometime!',
             textAlign: TextAlign.center,
           );
         }
@@ -280,7 +291,8 @@ class ProductCartDetails extends StatelessWidget {
 class GeneralProductsCartDetails extends StatelessWidget {
   final String uid;
 
-  const GeneralProductsCartDetails({Key? key, required this.uid}) : super(key: key);
+  const GeneralProductsCartDetails({Key? key, required this.uid})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -309,7 +321,8 @@ class GeneralProductsCartDetails extends StatelessWidget {
         }
 
         return FutureBuilder<Map<String, dynamic>>(
-          future: CostContainerDatabase.fetchGeneralProductsDetails(generalProductWidgets),
+          future: CostContainerDatabase.fetchGeneralProductsDetails(
+              generalProductWidgets),
           builder: (context, categoriesSnapshot) {
             if (categoriesSnapshot.connectionState == ConnectionState.waiting) {
               return CircularProgressIndicator();
@@ -355,7 +368,6 @@ class GeneralProductsCartDetails extends StatelessWidget {
   }
 }
 
-
 class ServicesCartDetails extends StatelessWidget {
   final String uid;
 
@@ -385,7 +397,8 @@ class ServicesCartDetails extends StatelessWidget {
         }
 
         return FutureBuilder<Map<String, dynamic>>(
-          future: CostContainerDatabase.fetchserviceCategoriesDetails(servicesWidgets),
+          future: CostContainerDatabase.fetchserviceCategoriesDetails(
+              servicesWidgets),
           builder: (context, categoriesSnapshot) {
             if (categoriesSnapshot.connectionState == ConnectionState.waiting) {
               return CircularProgressIndicator();
@@ -517,7 +530,7 @@ class DiscountDetails extends StatelessWidget {
       children: [
         Expanded(
           child: Text(
-            "Discount",
+            "Savings",
             style: TextStyle(
               fontFamily: 'LexendLight',
               fontSize: 14,
@@ -535,9 +548,7 @@ class DiscountDetails extends StatelessWidget {
               return Text("0");
             } else {
               return Text(
-                snapshot.data!['totaldiscount'] > 0.00
-                    ? '₹ -${NumberFormat('#,##,##0.00').format(snapshot.data!['totaldiscount'])}  '
-                    : '₹ ${NumberFormat('#,##,##0.00').format(snapshot.data!['totaldiscount'])}  ',
+                '₹ ${NumberFormat('#,##,##0.00').format(snapshot.data!['totaldiscount'])}  ',
                 style: TextStyle(
                   fontFamily: 'LexendLight',
                   fontSize: 14,
@@ -598,7 +609,8 @@ class ToPayDetails extends StatelessWidget {
 class ContinueToPaymentSection extends StatelessWidget {
   final String uid;
 
-  const ContinueToPaymentSection({Key? key, required this.uid}) : super(key: key);
+  const ContinueToPaymentSection({Key? key, required this.uid})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -607,27 +619,26 @@ class ContinueToPaymentSection extends StatelessWidget {
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Center(
-          child: Container(
-            padding: EdgeInsets.all(20.0),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(10.0),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.grey.withOpacity(0.5),
-                  spreadRadius: 2,
-                  blurRadius: 5,
-                  offset: Offset(0, 3), // changes position of shadow
-                ),
-              ],
+            child: Container(
+              padding: EdgeInsets.all(20.0),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(10.0),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.5),
+                    spreadRadius: 2,
+                    blurRadius: 5,
+                    offset: Offset(0, 3), // changes position of shadow
+                  ),
+                ],
+              ),
+              child: SpinKitFadingCircle(
+                color: darkBlue50Color,
+                size: 50.0,
+              ),
             ),
-            child: SpinKitFadingCircle(
-              color: darkBlue50Color,
-              size: 50.0,
-            ),
-          ),
-        );
-      
+          );
         } else if (snapshot.hasError) {
           return Text("Try after some time");
         } else {
@@ -641,4 +652,3 @@ class ContinueToPaymentSection extends StatelessWidget {
     );
   }
 }
-

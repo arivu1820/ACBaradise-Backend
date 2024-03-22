@@ -70,7 +70,7 @@ class ProductsListContainer extends StatelessWidget {
                     child: Row(
                       children: [
                         Text(
-                          '₹ ${NumberFormat('#,##,###').format((mrp - (mrp * discount / 100)))}',
+                          '₹ ${NumberFormat('#,##,###').format((mrp - (mrp * discount / 100)).ceilToDouble())}',
                           style: TextStyle(
                             fontSize: 24,
                             fontFamily: "LexendRegular",
@@ -101,7 +101,7 @@ class ProductsListContainer extends StatelessWidget {
                     child: Row(
                       children: [
                         Text(
-                          '(save ₹ ${NumberFormat('#,##,###').format(mrp - (mrp - (mrp * discount / 100)))})',
+                          '(save ₹ ${NumberFormat('#,##,###').format(mrp - (mrp - (mrp * discount / 100)).ceilToDouble())})',
                           style: TextStyle(
                               color: darkBlueColor,
                               fontFamily: "LexendRegular",

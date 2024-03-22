@@ -103,7 +103,7 @@ class ACProductScreen extends StatelessWidget {
                     child: Row(
                       children: [
                         Text(
-                          '₹ ${NumberFormat('#,##,###').format((mrp - (mrp * discount / 100)))}',
+                          '₹ ${NumberFormat('#,##,###').format((mrp - (mrp * discount / 100)).ceilToDouble())}',
                           style: TextStyle(
                             fontFamily: "LexendRegular",
                             fontSize: 30,
@@ -130,7 +130,7 @@ class ACProductScreen extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.only(top: 20, right: 20, left: 20),
                   child: Text(
-                          '(save ₹ ${NumberFormat('#,##,###').format(mrp - (mrp - (mrp * discount / 100)))})',
+                          '(save ₹ ${NumberFormat('#,##,###').format(mrp - (mrp - (mrp * discount / 100)).ceilToDouble())})',
                     style: TextStyle(
                       fontFamily: "LexendRegular",
                       fontSize: 20,

@@ -24,7 +24,7 @@ class OrdersScreen extends StatelessWidget {
             .snapshots(),
         builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
+            return Center(child: CircularProgressIndicator(color: darkBlueColor,strokeWidth: 2,));
           }
 
           if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
@@ -43,6 +43,7 @@ class OrdersScreen extends StatelessWidget {
               String name = orderData['name'];
               String contact = orderData['contact'];
               String address = orderData['address'];
+              String orderTitle = orderData['orderTitle'] ?? '';
               DateTime dateTime = CreatedAt.toDate();
               List orderdetails = orderData['OrderDetails'];
 
@@ -65,6 +66,7 @@ class OrdersScreen extends StatelessWidget {
                   child: ACPContainer(
                       ifTrue: true,
                       CreatedAt: dateTime,
+                      OrderTitle: orderTitle,
                       OrderId: OrderId,
                       TotalPrice: TotalPrice));
             },

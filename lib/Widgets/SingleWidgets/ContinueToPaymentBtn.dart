@@ -1,5 +1,6 @@
 import 'package:acbaradise/Screens/PaymentScreen.dart';
 import 'package:acbaradise/Theme/Colors.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
@@ -7,8 +8,12 @@ import 'package:uuid/uuid.dart';
 class ContinueToPayment extends StatelessWidget {
   final String uid;
   final num totalprice;
-  final Map<String,dynamic> allserviceproductdetails;
-  const ContinueToPayment({super.key,required this.uid,required this.totalprice,required this.allserviceproductdetails});
+  final Map<String, dynamic> allserviceproductdetails;
+  const ContinueToPayment(
+      {super.key,
+      required this.uid,
+      required this.totalprice,
+      required this.allserviceproductdetails});
 
   @override
   Widget build(BuildContext context) {
@@ -43,8 +48,7 @@ class ContinueToPayment extends StatelessWidget {
                 ),
               ),
               Text(
-                '₹ ${NumberFormat('#,##,##0.00').format(totalprice
-                                    )}  ',
+                '₹ ${NumberFormat('#,##,##0.00').format(totalprice)}  ',
                 style: const TextStyle(
                   fontSize: 20,
                   fontFamily: "LexendMedium",
@@ -55,13 +59,35 @@ class ContinueToPayment extends StatelessWidget {
           ),
           Expanded(
             child: GestureDetector(
-              onTap:totalprice<=0.00?(){}: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => PaymentScreen(uid: uid,amount: totalprice,allincart: allserviceproductdetails,uniqueid: uniqueid,),
-                    ));
-              },
+              onTap: totalprice <= 0.00
+                  ? () {}
+                  : () async {
+                      bool isSelectedAddress = await checkSelectedAddress(uid);
+                      if (isSelectedAddress) {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => PaymentScreen(
+                              uid: uid,
+                              amount: totalprice,
+                              allincart: allserviceproductdetails,
+                              uniqueid: uniqueid,
+                            ),
+                          ),
+                        );
+                      } else {
+                        const snackDemo = SnackBar(
+                          content: Text("Please select your address"),
+                          backgroundColor: darkBlueColor,
+                          elevation: 10,
+                          behavior: SnackBarBehavior.floating,
+                          margin: EdgeInsets.all(5),
+                          duration: Duration(seconds: 3),
+                        );
+                        ScaffoldMessenger.of(context).removeCurrentSnackBar();
+                        ScaffoldMessenger.of(context).showSnackBar(snackDemo);
+                      }
+                    },
               child: Container(
                 height: 60,
                 margin: const EdgeInsets.symmetric(
@@ -69,16 +95,16 @@ class ContinueToPayment extends StatelessWidget {
                 ),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(5),
-                  color:totalprice<=0.00? lightBlue50Color:lightBlueColor,
+                  color: totalprice <= 0.00 ? lightBlue50Color : lightBlueColor,
                 ),
                 child: Center(
                   child: Text(
                     "Continue To Payment",
                     textAlign: TextAlign.center,
-                    style:  TextStyle(
+                    style: TextStyle(
                       fontSize: 18,
                       fontFamily: "LexendLight",
-                      color:totalprice<=0.00? black50Color : blackColor,
+                      color: totalprice <= 0.00 ? black50Color : blackColor,
                     ),
                   ),
                 ),
@@ -88,5 +114,19 @@ class ContinueToPayment extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  Future<bool> checkSelectedAddress(String uid) async {
+    QuerySnapshot snapshot = await FirebaseFirestore.instance
+        .collection('Users')
+        .doc(uid)
+        .collection('AddedAddress')
+        .get();
+    for (QueryDocumentSnapshot document in snapshot.docs) {
+      if (document['isSelected'] == true) {
+        return true;
+      }
+    }
+    return false;
   }
 }

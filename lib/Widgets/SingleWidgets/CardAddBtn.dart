@@ -29,10 +29,13 @@ class _CartAddBtnState extends State<CartAddBtn> {
   bool added = true;
   int count = 0;
   int MRP = 0;
+  int stock = 0;
+
   int discountPercentage = 0;
   int TotalSparesMRP = 0;
   int wet360MRP = 0;
   bool wet360degree = false;
+  bool isremove = false;
 
   @override
   void initState() {
@@ -69,10 +72,12 @@ class _CartAddBtnState extends State<CartAddBtn> {
           // If the document exists, fetch the count value
           int fetchedMRP = productSnapshot['MRP'] ?? 0;
           int fetchedDiscount = productSnapshot['Discount'] ?? 0;
+          int fetchedStock = productSnapshot['Stock'] ?? 0;
 
           // Update the local count and added variable
           setState(() {
             MRP = fetchedMRP;
+            stock = fetchedStock;
             discountPercentage = fetchedDiscount;
           });
 
@@ -96,10 +101,12 @@ class _CartAddBtnState extends State<CartAddBtn> {
         // If the document exists, fetch the count value
         int fetchedMRP = cartSnapshot['MRP'] ?? 0;
         int fetchedDiscount = cartSnapshot['Discount'] ?? 0;
+        int fetchedStock = cartSnapshot['Stock'] ?? 0;
 
         // Update the local count and added variable
         setState(() {
           MRP = fetchedMRP;
+          stock = fetchedStock;
           discountPercentage = fetchedDiscount;
         });
       } else {
@@ -135,12 +142,14 @@ class _CartAddBtnState extends State<CartAddBtn> {
           int fetchedis360MRP = cartSnapshot['Wash360MRP'] ?? 0;
           // Now you can use is360degreeValue in your logic
           setState(() {
+            stock = 100;
             wet360MRP = fetchedis360MRP;
           });
         }
 
         // Update the local count and added variable
         setState(() {
+          stock = 100;
           MRP = fetchedMRP;
           discountPercentage = fetchedDiscount;
         });
@@ -173,6 +182,7 @@ class _CartAddBtnState extends State<CartAddBtn> {
         // Update the local count and added variable
         setState(() {
           MRP = fetchedMRP;
+          stock = 100;
           discountPercentage = fetchedDiscount;
           TotalSparesMRP = fetchedTotalSparesMRP;
         });
@@ -184,10 +194,10 @@ class _CartAddBtnState extends State<CartAddBtn> {
     }
   }
 
-  int calculateDiscountedMRP(int totalspares, int wet360) {
+  double calculateDiscountedMRP(int totalspares, int wet360) {
     int totalMRP = (MRP + totalspares + wet360) * count;
     double discountedMRP = totalMRP - (totalMRP * discountPercentage / 100);
-    return discountedMRP.toInt();
+    return discountedMRP.ceilToDouble();
   }
 
   Future<void> checkproductsserviceInCart() async {
@@ -267,7 +277,16 @@ class _CartAddBtnState extends State<CartAddBtn> {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        added
+        if (count > stock)
+          Text(
+            'Out of stock',
+            style: const TextStyle(
+              fontFamily: "lexendRegular",
+              fontSize: 16,
+              color: brownColor,
+            ),
+          ),
+        count >= 1  
             ? Container(
                 width: 90,
                 height: 40,
@@ -293,10 +312,11 @@ class _CartAddBtnState extends State<CartAddBtn> {
                       IconButton(
                         onPressed: () async {
                           Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) =>MyCartScreen(uid: widget.uid)),
-                              );
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    MyCartScreen(uid: widget.uid)),
+                          );
 
                           try {
                             if (count > 1) {
@@ -312,7 +332,6 @@ class _CartAddBtnState extends State<CartAddBtn> {
                               setState(() {
                                 count = --count;
                               });
-                              
                             } else if (count == 1) {
                               // Decrement to 0, remove the document from Firestore
                               await FirebaseFirestore.instance
@@ -320,16 +339,12 @@ class _CartAddBtnState extends State<CartAddBtn> {
                                   .doc(widget.uid)
                                   .collection(widget.collectionid)
                                   .doc(widget.productid)
-                                  .delete();
-
-                              // Update the local state
+                                  .update({'count': FieldValue.increment(-1)});
                               setState(() {
                                 count = --count;
                                 added = false;
                               });
-                              
                             }
-                            
                           } catch (error) {
                             // Navigator.push(
                             //   context,
@@ -364,41 +379,53 @@ class _CartAddBtnState extends State<CartAddBtn> {
                           color: darkBlueColor,
                         ),
                       ),
-                      IconButton(
-                        onPressed: () async {
-                          Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) =>MyCartScreen(uid: widget.uid)),
-                              );
-                          try {
-                            // Increment the count in Firestore document
-                            await FirebaseFirestore.instance
-                                .collection('Users')
-                                .doc(widget.uid)
-                                .collection(widget.collectionid)
-                                .doc(widget.productid)
-                                .update({'count': FieldValue.increment(1)});
+                      (stock > count)
+                          ? IconButton(
+                              onPressed: () async {
+                                Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          MyCartScreen(uid: widget.uid)),
+                                );
+                                try {
+                                  // Increment the count in Firestore document
+                                  if (stock > count) {
+                                    await FirebaseFirestore.instance
+                                        .collection('Users')
+                                        .doc(widget.uid)
+                                        .collection(widget.collectionid)
+                                        .doc(widget.productid)
+                                        .update(
+                                            {'count': FieldValue.increment(1)});
+                                  }
 
-                            // Update the local state
-                            // setState(() {
-                            //   count = ++count;
-                            // });
-                          } catch (error) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                    'Error updating count in Firestore: $error'),
+                                  // Update the local state
+                                  // setState(() {
+                                  //   count = ++count;
+                                  // });
+                                } catch (error) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                          'Error updating count in Firestore: $error'),
+                                    ),
+                                  );
+                                }
+                              },
+                              icon: Image.asset(
+                                "Assets/Icons/Plus.png",
+                                height: 14,
+                                width: 14,
                               ),
-                            );
-                          }
-                        },
-                        icon: Image.asset(
-                          "Assets/Icons/Plus.png",
-                          height: 14,
-                          width: 14,
-                        ),
-                      ),
+                            )
+                          : Padding(
+                              padding: const EdgeInsets.only(right: 30),
+                              child: const SizedBox(
+                                height: 14,
+                                width: 14,
+                              ),
+                            ),
                       const SizedBox(
                         width: 10,
                       ),
@@ -414,7 +441,7 @@ class _CartAddBtnState extends State<CartAddBtn> {
                   borderRadius: BorderRadius.circular(5),
                   boxShadow: [
                     BoxShadow(
-                      color: darkBlue50Color,
+                      color: brown50Color,
                       offset: Offset(0, 0),
                       blurRadius: 4,
                       spreadRadius: 0,
@@ -427,18 +454,29 @@ class _CartAddBtnState extends State<CartAddBtn> {
                     padding: const EdgeInsets.only(
                         right: 20, left: 20, top: 10, bottom: 10),
                     child: GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          added = true;
-                          count = ++count;
-                        });
+                      onTap: () async {
+                        await FirebaseFirestore.instance
+                            .collection('Users')
+                            .doc(widget.uid)
+                            .collection(widget.collectionid)
+                            .doc(widget.productid)
+                            .delete();
+
+                        Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    MyCartScreen(uid: widget.uid)),
+                          );
+
+                        // Update the local state
                       },
                       child: Text(
-                        "Add",
+                        "Remove",
                         style: const TextStyle(
                           fontFamily: "lexendRegular",
                           fontSize: 20,
-                          color: darkBlueColor,
+                          color: brown50Color,
                         ),
                       ),
                     ),
@@ -448,19 +486,20 @@ class _CartAddBtnState extends State<CartAddBtn> {
         const SizedBox(
           height: 10,
         ),
-        Text(
-          wet360degree
-              ? '₹ ${NumberFormat('#,##,###').format(calculateDiscountedMRP(0, wet360MRP))}  '
-              // : '₹ ${NumberFormat('#,##,###').format(calculateDiscountedMRP(0, 0))}  ',
-              : UseTotalSpares
-                  ? '₹ ${NumberFormat('#,##,###').format(calculateDiscountedMRP(TotalSparesMRP, 0))}  '
-                  : '₹ ${NumberFormat('#,##,###').format(calculateDiscountedMRP(0, 0))}  ',
-          style: const TextStyle(
-            fontFamily: "LexendLight",
-            fontSize: 17,
-            color: blackColor,
+        if (count >= 1)
+          Text(
+            wet360degree
+                ? '₹ ${NumberFormat('#,##,###').format(calculateDiscountedMRP(0, wet360MRP))}  '
+                // : '₹ ${NumberFormat('#,##,###').format(calculateDiscountedMRP(0, 0))}  ',
+                : UseTotalSpares
+                    ? '₹ ${NumberFormat('#,##,###').format(calculateDiscountedMRP(TotalSparesMRP, 0))}  '
+                    : '₹ ${NumberFormat('#,##,###').format(calculateDiscountedMRP(0, 0))}  ',
+            style: const TextStyle(
+              fontFamily: "LexendLight",
+              fontSize: 17,
+              color: blackColor,
+            ),
           ),
-        ),
       ],
     );
   }

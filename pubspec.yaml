@@ -117,6 +117,19 @@ flutter:
     - Assets/Icons/AMC_Img.png
     - Assets/Icons/Serviceman_Img.png
     - Assets/Icons/service.png
+    - Assets/Icons/B1.png
+    - Assets/Icons/B2.png
+    - Assets/Icons/B3.png
+    - Assets/Icons/B4.png
+    - Assets/Icons/B5.png
+    - Assets/Icons/B6.png
+    - Assets/Icons/B7.png
+    - Assets/Icons/B8.png
+    - Assets/Icons/B9.png
+    - Assets/Icons/B10.png
+    - Assets/Icons/B11.png
+    - Assets/Icons/B12.png
+    - Assets/Icons/AMCHPimage.png
     - Assets/Icons/Google_Marker.png
 
   # An image asset can refer to one or more resolution-specific "variants", see

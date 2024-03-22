@@ -55,7 +55,7 @@ class InstallUninstallContentContainer extends StatelessWidget {
                           children: [
                             TextSpan(
                               text:
-                                  '₹ ${NumberFormat('#,##,###').format((MRP - (MRP * discount / 100)))}  ',
+                                  '₹ ${NumberFormat('#,##,###').format((MRP - (MRP * discount / 100)).ceilToDouble())}  ',
                               style: TextStyle(
                                 fontFamily: "LexendRegular",
                                 fontSize: 20,

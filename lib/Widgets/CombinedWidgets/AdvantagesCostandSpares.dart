@@ -182,8 +182,8 @@ class _AdvantagesCostandSparesState extends State<AdvantagesCostandSpares> {
                       children: [
                         Text(
                           isSelected
-                              ? '₹ ${NumberFormat('#,##,###').format(((widget.mrp+widget.TotalSparesMRP) - ((widget.mrp+widget.TotalSparesMRP) * widget.discount / 100)))}  '
-                              : '₹ ${NumberFormat('#,##,###').format((widget.mrp - (widget.mrp * widget.discount / 100)))}  ',
+                              ? '₹ ${NumberFormat('#,##,###').format(((widget.mrp+widget.TotalSparesMRP) - ((widget.mrp+widget.TotalSparesMRP) * widget.discount / 100)).ceilToDouble())}  '
+                              : '₹ ${NumberFormat('#,##,###').format((widget.mrp - (widget.mrp * widget.discount / 100)).ceilToDouble())}  ',
                           style: const TextStyle(
                               fontFamily: "LexendMedium",
                               fontSize: 30,

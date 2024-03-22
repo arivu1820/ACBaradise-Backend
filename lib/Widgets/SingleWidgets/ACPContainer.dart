@@ -8,8 +8,9 @@ class ACPContainer extends StatelessWidget {
   final DateTime CreatedAt;
   final String OrderId;
   final num TotalPrice;
+  final String OrderTitle;
 
-  const ACPContainer({Key? key, required this.ifTrue, required this.CreatedAt, required this.OrderId, required this.TotalPrice}) : super(key: key);
+  const ACPContainer({Key? key, required this.ifTrue,this.OrderTitle='', required this.CreatedAt, required this.OrderId, required this.TotalPrice}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -30,8 +31,7 @@ class ACPContainer extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Expanded(
-                  child: Text(
-                    "Voltas 183V Vectra Platina 4 in 1 Convertible 1.5 Ton 3 Star Inverter Split AC with Anti Dust Filter (2023 Model, Copper. Platina 4 in 1 Conv",
+                  child: Text(OrderTitle,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(

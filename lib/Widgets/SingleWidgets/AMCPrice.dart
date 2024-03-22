@@ -14,7 +14,7 @@ class AMCPrice extends StatelessWidget {
         Column(
           children: [
             Text(
-              '₹ ${NumberFormat('#,##,###').format((mrp - (mrp * discount / 100)))}  ',
+              '₹ ${NumberFormat('#,##,###').format((mrp - (mrp * discount / 100)).ceilToDouble())}  ',
               style: const TextStyle(
                 fontSize: 18,
                 fontFamily: "LexendMedium",
