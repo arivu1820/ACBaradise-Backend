@@ -1,22 +1,23 @@
+import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:acbaradise/Screens/AddAddressDetailsScreen.dart';
 import 'package:acbaradise/Widgets/SingleWidgets/AppbarWithCart.dart';
-import 'package:flutter/material.dart';
-import 'package:acbaradise/Theme/Colors.dart';
 import 'package:acbaradise/Widgets/CombinedWidgets/AddressContainer.dart';
 import 'package:acbaradise/Widgets/SingleWidgets/CommonBtn.dart';
-
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:acbaradise/Theme/Colors.dart';
 
 class SelectAddressScreen extends StatefulWidget {
   final String uid;
+  final List<String> availablePinCodes;
 
-  SelectAddressScreen({Key? key, required this.uid}) : super(key: key);
+  SelectAddressScreen({Key? key, required this.uid,required this.availablePinCodes}) : super(key: key);
 
   @override
   State<SelectAddressScreen> createState() => _SelectAddressScreenState();
 }
 
 class _SelectAddressScreenState extends State<SelectAddressScreen> {
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -48,6 +49,19 @@ class _SelectAddressScreenState extends State<SelectAddressScreen> {
                   );
                 }
 
+                // Check and delete addresses with invalid pin codes
+                documents.forEach((document) {
+                  String pincode = document['Pincode'] ?? '';
+                  if (!widget.availablePinCodes.contains(pincode)) {
+                    FirebaseFirestore.instance
+                        .collection('Users')
+                        .doc(widget.uid)
+                        .collection('AddedAddress')
+                        .doc(document.id)
+                        .delete();
+                  }
+                });
+
                 return ListView.builder(
                   itemBuilder: (context, index) {
                     var document = documents[index];
@@ -55,6 +69,7 @@ class _SelectAddressScreenState extends State<SelectAddressScreen> {
                     String houseNoFloor = document['HouseNoFloor'] ?? '';
                     String buildingStreet = document['BuildingStreet'] ?? '';
                     String landmarkAreaName = document['LandmarkAreaName'] ?? '';
+                    String pincode = document['Pincode'] ?? '';
                     String contact = document['Contact'] ?? '';
                     bool isSelected = document['isSelected'] ?? false;
 
@@ -83,7 +98,7 @@ class _SelectAddressScreenState extends State<SelectAddressScreen> {
                         Navigator.of(context).pop();
                       },
                       child: AddressContainer(
-                        Address: '$houseNoFloor, $buildingStreet $landmarkAreaName.',
+                        Address: '$houseNoFloor, $buildingStreet $landmarkAreaName  $pincode.',
                         Contact: contact,
                         isSelected: isSelected,
                         onDelete: () {
@@ -109,7 +124,7 @@ class _SelectAddressScreenState extends State<SelectAddressScreen> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => AddAddressDetailsScreen(uid: widget.uid),
+                  builder: (context) => AddAddressDetailsScreen(uid: widget.uid, availablePinCodes:widget.availablePinCodes),
                 ),
               );
             },

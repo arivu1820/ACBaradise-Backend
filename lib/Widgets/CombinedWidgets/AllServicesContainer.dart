@@ -1,4 +1,3 @@
-
 import 'package:acbaradise/Screens/AnnualContractScreen.dart';
 import 'package:acbaradise/Theme/Colors.dart';
 import 'package:acbaradise/Widgets/SingleWidgets/ServicesContainer.dart';
@@ -96,7 +95,9 @@ class AllServicesContainer extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => AnnualContractScreen(uid: uid,)),
+                      builder: (context) => AnnualContractScreen(
+                            uid: uid,
+                          )),
                 );
               },
               child: Container(
@@ -112,7 +113,10 @@ class AllServicesContainer extends StatelessWidget {
                     Padding(
                       padding: const EdgeInsets.only(left: 10, right: 20),
                       child: Text(
-                        serviceDataList[4]['serviceName'],
+                        serviceDataList.length > 4 &&
+                                serviceDataList[4].containsKey('serviceName')
+                            ? serviceDataList[4]['serviceName']
+                            : 'Annual Contract',
                         style: TextStyle(
                           fontFamily: "LexendMedium",
                           fontSize: 16,
@@ -129,8 +133,7 @@ class AllServicesContainer extends StatelessWidget {
                         bottomRight: Radius.circular(10),
                       ),
                       child: Container(
-                        child: Image.asset("Assets/Icons/Serviceman_Img.png"
-                        ),
+                        child: Image.asset("Assets/Icons/Serviceman_Img.png"),
                         height: 130,
                         width: 170,
                       ),

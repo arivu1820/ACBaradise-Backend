@@ -8,10 +8,17 @@ class HomePageProductsList extends StatelessWidget {
   final String CategoryId;
   final String CategoryName;
   final List<String> ProductName;
-    final List<String> ImageURL;
+  final List<String> ImageURL;
   final String uid;
+  final List<String> proid;
 
-  HomePageProductsList({required this.CategoryId , required this.CategoryName, required this.ProductName,required this.ImageURL,required this.uid});
+  HomePageProductsList(
+      {required this.CategoryId,
+      required this.CategoryName,
+      required this.proid,
+      required this.ProductName,
+      required this.ImageURL,
+      required this.uid});
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +45,7 @@ class HomePageProductsList extends StatelessWidget {
               child: ListView.builder(
                 scrollDirection: Axis.horizontal,
                 itemBuilder: (context, index) {
-                  return index != 0
+                  return index != 3
                       ? Container(
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(3),
@@ -67,7 +74,11 @@ class HomePageProductsList extends StatelessWidget {
                                         context,
                                         MaterialPageRoute(
                                           builder: (context) => ACProductScreen(
-                                              ProductName: "VOLTAS 183V ",ProductId: "asdf",CategoryId: "adsf",uid: uid,),
+                                            ProductName: ProductName[index],
+                                            ProductId: proid[index],
+                                            CategoryId: CategoryId,
+                                            uid: uid,
+                                          ),
                                         ));
                                   },
                                   child: Container(
@@ -78,7 +89,7 @@ class HomePageProductsList extends StatelessWidget {
                                   ),
                                 ),
                                 const SizedBox(height: 10),
-                                 Text(
+                                Text(
                                   ProductName[index],
                                   maxLines: 2,
                                   overflow: TextOverflow.ellipsis,
@@ -98,7 +109,10 @@ class HomePageProductsList extends StatelessWidget {
                               context,
                               MaterialPageRoute(
                                   builder: (context) => ProductListScreen(
-                                      CategoryName: CategoryName,CategoryId: CategoryId,uid: uid,)),
+                                        CategoryName: CategoryName,
+                                        CategoryId: CategoryId,
+                                        uid: uid,
+                                      )),
                             );
                           },
                           child: HomePageSeeMoreContainer());

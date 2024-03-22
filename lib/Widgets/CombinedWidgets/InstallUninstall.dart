@@ -27,6 +27,15 @@ class InstallUninstall extends StatelessWidget {
 
         var installUninstallDocuments = installUninstallSnapshot.data!.docs;
 
+        if (installUninstallDocuments.isEmpty) {
+          return Center(
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Text('No Install Uninstall service available right now',style: TextStyle(color: blackColor,fontFamily: 'LexendRegular',fontSize: 16),),
+            ),
+          );
+        }
+
         // Use installUninstallDocuments to access data from all documents in the InstallUninstall subcollection
         List<Widget> installUninstallWidgets =
             installUninstallDocuments.map((installUninstallDocument) {

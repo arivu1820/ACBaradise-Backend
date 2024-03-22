@@ -21,8 +21,17 @@ class GeneralService extends StatelessWidget {
         if (serviceSnapshot.hasError) {
           return Text('Error: ${serviceSnapshot.error}');
         }
-
         var categoryDocuments = serviceSnapshot.data!.docs;
+
+        if (categoryDocuments.isEmpty) {
+          return Center(
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Text('No General service available right now',style: TextStyle(color: blackColor,fontFamily: 'LexendRegular',fontSize: 16),),
+            ),
+          );
+        }
+
 
         // Use categoryDocuments to access data from all documents in the Categories subcollection
         List<Widget> generalServiceWidgets =

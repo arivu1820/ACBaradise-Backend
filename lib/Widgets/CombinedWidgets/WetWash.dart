@@ -25,6 +25,15 @@ class WetWash extends StatelessWidget {
 
         var wetWashDocuments = wetWashSnapshot.data!.docs;
 
+        if (wetWashDocuments.isEmpty) {
+          return Center(
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Text('No Wet Wash service available right now',style: TextStyle(color: blackColor,fontFamily: 'LexendRegular',fontSize: 16),),
+            ),
+          );
+        }
+
         // Use wetWashDocuments to access data from all documents in the WetWash subcollection
         List<Widget> wetWashWidgets = wetWashDocuments.map((wetWashDocument) {
           // Adjust the field names according to your data model

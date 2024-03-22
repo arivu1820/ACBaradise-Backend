@@ -3,10 +3,31 @@ import 'package:acbaradise/Theme/Colors.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class SelectAnAddress extends StatelessWidget {
+class SelectAnAddress extends StatefulWidget {
   final String uid;
 
   const SelectAnAddress({Key? key, required this.uid}) : super(key: key);
+
+  @override
+  State<SelectAnAddress> createState() => _SelectAnAddressState();
+}
+
+class _SelectAnAddressState extends State<SelectAnAddress> {
+    List<String> availablePinCodes = [];
+
+  @override
+  void initState() {
+    super.initState();
+    // Retrieve available pin codes from Firestore
+    FirebaseFirestore.instance
+        .collection('AvailableArea')
+        .get()
+        .then((QuerySnapshot querySnapshot) {
+      querySnapshot.docs.forEach((doc) {
+        availablePinCodes.add(doc['pincode']);
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,7 +65,7 @@ class SelectAnAddress extends StatelessWidget {
             child: StreamBuilder<QuerySnapshot>(
               stream: FirebaseFirestore.instance
                   .collection('Users')
-                  .doc(uid)
+                  .doc(widget.uid)
                   .collection('AddedAddress')
                   .snapshots(),
               builder: (context, snapshot) {
@@ -104,7 +125,7 @@ class SelectAnAddress extends StatelessWidget {
                           context,
                           MaterialPageRoute(
                             builder: (context) =>
-                                SelectAddressScreen(uid: uid),
+                                SelectAddressScreen(uid: widget.uid,availablePinCodes: availablePinCodes,),
                           ),
                         );
                       },

@@ -2,7 +2,6 @@ import 'package:acbaradise/Models/DataBaseHelper.dart';
 import 'package:acbaradise/Theme/Colors.dart';
 import 'package:acbaradise/Widgets/CombinedWidgets/AllServicesContainer.dart';
 import 'package:acbaradise/Widgets/CombinedWidgets/GeneralService.dart';
-import 'package:acbaradise/Widgets/CombinedWidgets/HomePageProductsList.dart';
 import 'package:acbaradise/Widgets/CombinedWidgets/InstallUninstall.dart';
 import 'package:acbaradise/Widgets/CombinedWidgets/Repair.dart';
 import 'package:acbaradise/Widgets/CombinedWidgets/WetWash.dart';
@@ -72,7 +71,7 @@ class ServiceScreen extends StatelessWidget {
                         categorySnapshot.data!.docs.forEach((doc) {
                           // Extract data from the document
                           String serviceName = doc['ServiceName'];
-                          String imageUrl = doc['Image'];
+                          String imageUrl = doc['Image']; 
 
                           // Combine data into a map
                           Map<String, dynamic> serviceData = {

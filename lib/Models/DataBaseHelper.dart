@@ -167,31 +167,31 @@ class DatabaseHelper {
         .snapshots();
   }
 
-  //#######################################################################################################//
+  // //#######################################################################################################//
 
-  static Stream<QuerySnapshot> getWindowACCollection() {
-    return FirebaseFirestore.instance
-        .collection('Services')
-        .doc("hWHRjpawA5D6OTbrjn3h")
-        .collection("Categories")
-        .doc("5AMC")
-        .collection("WindowAC")
-        .snapshots();
-  }
+  // static Stream<QuerySnapshot> getWindowACCollection() {
+  //   return FirebaseFirestore.instance
+  //       .collection('Services')
+  //       .doc("hWHRjpawA5D6OTbrjn3h")
+  //       .collection("Categories")
+  //       .doc("5AMC")
+  //       .collection("WindowAC")
+  //       .snapshots();
+  // }
 
-  //#######################################################################################################//
+  // //#######################################################################################################//
 
-  static Stream<QuerySnapshot> getCassetteACCollection() {
-    return FirebaseFirestore.instance
-        .collection('Services')
-        .doc("hWHRjpawA5D6OTbrjn3h")
-        .collection("Categories")
-        .doc("5AMC")
-        .collection("CassetteAC")
-        .snapshots();
-  }
+  // static Stream<QuerySnapshot> getCassetteACCollection() {
+  //   return FirebaseFirestore.instance
+  //       .collection('Services')
+  //       .doc("hWHRjpawA5D6OTbrjn3h")
+  //       .collection("Categories")
+  //       .doc("5AMC")
+  //       .collection("CassetteAC")
+  //       .snapshots();
+  // }
 
-  //#######################################################################################################//
+  // //#######################################################################################################//
 
   static Stream<QuerySnapshot> GeneralServiceCollection(String ID) {
     return FirebaseFirestore.instance
@@ -320,11 +320,17 @@ class DatabaseHelper {
 
     List<String> productName = [];
     List<String> imageUrl = [];
+    List<String> proids = [];
+
 
     for (QueryDocumentSnapshot productDoc in productSnapshot.data!.docs) {
       String proName = productDoc['Name'];
       productName.add(proName);
+      String productId = productDoc.id; // Retrieve the product ID from the document
+      proids.add(productId);
     }
+
+    
 
     for (QueryDocumentSnapshot productImg in productSnapshot.data!.docs) {
       List<dynamic>? images = productImg['Images'];
@@ -339,8 +345,10 @@ class DatabaseHelper {
       CategoryId: categoryId,
       CategoryName: categoryName,
       ProductName: productName,
+      proid:proids,
       ImageURL: imageUrl,
       uid: uid,
+
     );
   }
 
