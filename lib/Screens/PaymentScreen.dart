@@ -57,7 +57,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
     totalamount = totalamount * 100;
     var options = {
       // Razorpay API Key
-      'key': 'rzp_test_bEVQhaC3E9rBPZ',
+      'key': 'rzp_live_un1Rk060cMTIoP',
       // in the smallest
       // currency sub-unit.
       'amount': totalamount,
