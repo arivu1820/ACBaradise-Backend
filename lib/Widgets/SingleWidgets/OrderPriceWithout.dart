@@ -16,7 +16,7 @@ class OrderPriceWithout extends StatelessWidget {
       children: [
         
         Text(
-         '₹ ${NumberFormat('#,##,##0.00').format(orderamount)}  ' ,
+         '₹ ${NumberFormat('#,##,##0.00').format(orderamount)}' ,
           style: const TextStyle(
             fontSize: 18,
             fontFamily: "LexendLight",
@@ -26,7 +26,7 @@ class OrderPriceWithout extends StatelessWidget {
         Text(
           "Qty: "+count.toString(),
           style: const TextStyle(
-            fontSize: 10,
+            fontSize: 12,
             fontFamily: "LexendLight",
             color: black50Color,
           ),

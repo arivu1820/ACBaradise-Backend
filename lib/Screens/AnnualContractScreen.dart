@@ -6,7 +6,6 @@ import 'package:acbaradise/Widgets/SingleWidgets/ServicePageBanner.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
-import 'package:acbaradise/Widgets/SingleWidgets/AnnualACCard.dart';
 import 'package:acbaradise/Widgets/CombinedWidgets/AnnualSchemeContainer.dart';
 
 class AnnualContractScreen extends StatefulWidget {
@@ -27,7 +26,7 @@ class _AnnualContractScreenState extends State<AnnualContractScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: whiteColor,
       appBar: AppbarWithCart(
         PageName: "Annual Contract",
         iscart: true,
@@ -123,7 +122,7 @@ class SplitACAnnualSchemeContainer extends StatelessWidget {
 
         if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
           return Center(
-            child: Text('Services not available right now'),
+            child: Expanded(child: Text('Services not available right now')),
           );
         }
 

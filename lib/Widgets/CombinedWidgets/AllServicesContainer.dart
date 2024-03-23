@@ -116,7 +116,7 @@ class AllServicesContainer extends StatelessWidget {
                         serviceDataList.length > 4 &&
                                 serviceDataList[4].containsKey('serviceName')
                             ? serviceDataList[4]['serviceName']
-                            : 'Annual Contract',
+                            : 'Annual Maintenance Contract',
                         style: TextStyle(
                           fontFamily: "LexendMedium",
                           fontSize: 16,

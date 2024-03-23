@@ -4,19 +4,26 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class ACPContainer extends StatelessWidget {
-  final bool ifTrue;
+  final String orderPayment;
   final DateTime CreatedAt;
   final String OrderId;
   final num TotalPrice;
   final String OrderTitle;
 
-  const ACPContainer({Key? key, required this.ifTrue,this.OrderTitle='', required this.CreatedAt, required this.OrderId, required this.TotalPrice}) : super(key: key);
+  const ACPContainer(
+      {Key? key,
+      required this.orderPayment,
+      this.OrderTitle = '',
+      required this.CreatedAt,
+      required this.OrderId,
+      required this.TotalPrice})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Center(
       child: Container(
-        margin: EdgeInsets.fromLTRB(20,10,20,0),
+        margin: EdgeInsets.fromLTRB(20, 10, 20, 0),
         padding: EdgeInsets.fromLTRB(20, 10, 20, 10),
         height: 100,
         width: double.infinity,
@@ -31,7 +38,8 @@ class ACPContainer extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Expanded(
-                  child: Text(OrderTitle,
+                  child: Text(
+                    OrderTitle,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
@@ -49,7 +57,7 @@ class ACPContainer extends StatelessWidget {
                   ),
                 ),
                 Text(
-                                  '₹ ${NumberFormat('#,##,##0.00').format(TotalPrice)}  ',
+                  '₹ ${NumberFormat('#,##,##0.00').format(TotalPrice)}  ',
                   style: const TextStyle(
                     fontSize: 14,
                     fontFamily: "LexendRegular",
@@ -69,7 +77,7 @@ class ACPContainer extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "Order #"+OrderId,
+                        "Order #" + OrderId,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
@@ -89,14 +97,21 @@ class ACPContainer extends StatelessWidget {
                     ],
                   ),
                 ),
-                const SizedBox(width: 20,),
-                Image.asset(
-                  ifTrue
-                      ? "Assets/Icons/Fulfilled.png"
-                      : "Assets/Icons/Group_82.png",
-                  height: ifTrue ? 15 : 20,
-                  width: ifTrue ? 55 : 55,
+                const SizedBox(
+                  width: 20,
                 ),
+                if (orderPayment == 'online' || orderPayment == 'confirm')
+                  Image.asset(
+                    "Assets/Icons/Fulfilled.png",
+                    height: 20,
+                    width: 55,
+                  ),
+                if (orderPayment == 'cancel')
+                  Image.asset(
+                    "Assets/Icons/Group_82.png",
+                    height: 20,
+                    width: 55,
+                  ),
               ],
             ),
           ],

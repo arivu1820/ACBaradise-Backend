@@ -6,6 +6,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import "package:acbaradise/Theme/Colors.dart";
 import 'package:acbaradise/Widgets/CombinedWidgets/CashonDelivery.dart';
+import 'package:flutter/widgets.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 import 'package:uuid/uuid.dart';
 
@@ -84,7 +85,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
   }
 
   Future<void> _handlePaymentSuccess(PaymentSuccessResponse response) async {
-    await placeOrder();
+    await placeOrder('online');
 
     const snackDemo = SnackBar(
       content: Text("Your Order Placed Successfully"),
@@ -102,23 +103,23 @@ class _PaymentScreenState extends State<PaymentScreen> {
         MaterialPageRoute(
           builder: (context) => OrdersScreen(uid: widget.uid),
         ));
-        setState(() {
-                                issubmited = false;
-                              });
+    setState(() {
+      issubmited = false;
+    });
     print("All products are available. Proceeding with the order.");
   }
 
   void _handlePaymentError(PaymentFailureResponse response) {
     setState(() {
-                                issubmited = false;
-                              });
+      issubmited = false;
+    });
     const snackDemo = SnackBar(
-      content: Text("Payment failed. Please try again."),
+      content: Text("Payment failed. Contact support center for quries"),
       backgroundColor: brownColor,
       elevation: 10,
       behavior: SnackBarBehavior.floating,
       margin: EdgeInsets.all(5),
-      duration: Duration(seconds: 3),
+      duration: Duration(seconds: 5),
     );
     ScaffoldMessenger.of(context).removeCurrentSnackBar();
     ScaffoldMessenger.of(context).showSnackBar(snackDemo);
@@ -165,77 +166,106 @@ class _PaymentScreenState extends State<PaymentScreen> {
                       });
                     },
                   ),
-                Container(
-                  padding: const EdgeInsets.only(
-                      left: 30, top: 30, bottom: 30, right: 20),
-                  decoration: const BoxDecoration(
-                    border: Border(
-                      bottom: BorderSide(
-                        color: lightBlue30Color,
-                        width: 1.0,
+                GestureDetector(
+                  onTap: () async {
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          // title: const Text('Payment'),
+                          content: const Text(
+                            "Please don't navigate away until your payment has been confirmed through our service. Thank you for your cooperation.",
+                            style: TextStyle(
+                                fontFamily: 'LexendRegular',
+                                fontSize: 16,
+                                color: blackColor),
+                          ),
+                          actions: <Widget>[
+                            TextButton(
+                              onPressed: () async {
+                                Navigator.of(context).pop();
+                                bool allProductsAvailable = await forproduct();
+                                if (allProductsAvailable) {
+                                  openCheckout(widget.amount);
+                                } else {
+                                  const snackDemo = SnackBar(
+                                    content: Text("Remove Out of Stock Items"),
+                                    backgroundColor: brownColor,
+                                    elevation: 10,
+                                    behavior: SnackBarBehavior.floating,
+                                    margin: EdgeInsets.all(5),
+                                    duration: Duration(seconds: 5),
+                                  );
+                                  ScaffoldMessenger.of(context)
+                                      .removeCurrentSnackBar();
+                                  ScaffoldMessenger.of(context)
+                                      .showSnackBar(snackDemo);
+                                  setState(() {
+                                    issubmited = false;
+                                  });
+                                  print(
+                                      "Not all products are available. Order cannot be processed.");
+                                } // Close the dialog
+                              },
+                              child: Text(
+                                'OK',
+                                style: TextStyle(
+                                    fontFamily: 'LexendRegular',
+                                    fontSize: 14,
+                                    color: darkBlueColor),
+                              ),
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                    setState(() {
+                      issubmited = true;
+                    });
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.only(
+                        left: 30, top: 30, bottom: 30, right: 20),
+                    decoration: const BoxDecoration(
+                      border: Border(
+                        bottom: BorderSide(
+                          color: lightBlue30Color,
+                          width: 1.0,
+                        ),
                       ),
                     ),
-                  ),
-                  child: Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(5),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: lightBlueColor),
-                          borderRadius: BorderRadius.circular(5.0),
-                        ),
-                        child: Image.asset(
-                          "Assets/Icons/Payment_method_icon.png",
-                          height: 40,
-                          width: 40,
-                        ),
-                      ),
-                      const SizedBox(width: 30),
-                      const Expanded(
-                        child: Text(
-                          "Pay Through Online",
-                          style: TextStyle(
-                            fontFamily: "OxygenRegular",
-                            fontSize: 16,
-                            color: blackColor,
+                    child: Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(5),
+                          decoration: BoxDecoration(
+                            border: Border.all(color: lightBlueColor),
+                            borderRadius: BorderRadius.circular(5.0),
+                          ),
+                          child: Image.asset(
+                            "Assets/Icons/Payment_method_icon.png",
+                            height: 40,
+                            width: 40,
                           ),
                         ),
-                      ),
-                      IconButton(
-                          onPressed: () async {
-                            setState(() {
-                              issubmited = true;
-                            });
-                            bool allProductsAvailable = await forproduct();
-                            if (allProductsAvailable) {
-                              openCheckout(widget.amount);
-                              
-                            } else {
-                              const snackDemo = SnackBar(
-                                content: Text("Remove Out of Stock Items"),
-                                backgroundColor: brownColor,
-                                elevation: 10,
-                                behavior: SnackBarBehavior.floating,
-                                margin: EdgeInsets.all(5),
-                                duration: Duration(seconds: 5),
-                              );
-                              ScaffoldMessenger.of(context)
-                                  .removeCurrentSnackBar();
-                              ScaffoldMessenger.of(context)
-                                  .showSnackBar(snackDemo);
-                              setState(() {
-                                issubmited = false;
-                              });
-                              print(
-                                  "Not all products are available. Order cannot be processed.");
-                            }
-                          },
-                          icon: Image.asset(
-                            "Assets/Icons/ArrowRight.png",
-                            height: 20,
-                            width: 10,
-                          ))
-                    ],
+                        const SizedBox(width: 30),
+                        const Expanded(
+                          child: Text(
+                            "Pay Through Online",
+                            style: TextStyle(
+                              fontFamily: "OxygenRegular",
+                              fontSize: 16,
+                              color: blackColor,
+                            ),
+                          ),
+                        ),
+                        Image.asset(
+                          "Assets/Icons/ArrowRight.png",
+                          height: 20,
+                          width: 10,
+                        )
+                      ],
+                    ),
                   ),
                 ),
                 SimplyExpand(),
@@ -255,7 +285,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
     });
     bool allProductsAvailable = await forproduct();
     if (allProductsAvailable) {
-      await placeOrder();
+      await placeOrder('offline');
 
       const snackDemo = SnackBar(
         content: Text("Your Order Placed Successfully"),
@@ -434,11 +464,11 @@ class _PaymentScreenState extends State<PaymentScreen> {
         continue;
       }
       String title = productData['productData']['Name'];
-if (orderTitle=='') {
-    orderTitle = title;
-} else {
-    orderTitle = orderTitle + ', ' + title;
-}
+      if (orderTitle == '') {
+        orderTitle = title;
+      } else {
+        orderTitle = orderTitle + ', ' + title;
+      }
 
       String img = productData['productData']['Images'][0];
       num discount = productData['productData']['Discount'] ?? 0;
@@ -497,11 +527,11 @@ if (orderTitle=='') {
         continue;
       }
       String title = productData['productData']['Name'];
-if (orderTitle=='') {
-    orderTitle = title;
-} else {
-    orderTitle = orderTitle + ', ' + title;
-}
+      if (orderTitle == '') {
+        orderTitle = title;
+      } else {
+        orderTitle = orderTitle + ', ' + title;
+      }
       String img = productData['productData']['Image'];
       num discount = productData['productData']['Discount'] ?? 0;
       num mrp = productData['productData']['MRP'] ?? 0;
@@ -559,11 +589,11 @@ if (orderTitle=='') {
         continue;
       }
       String title = productData['productData']['Title'];
-if (orderTitle=='') {
-    orderTitle = title;
-} else {
-    orderTitle = orderTitle + ', ' + title;
-}
+      if (orderTitle == '') {
+        orderTitle = title;
+      } else {
+        orderTitle = orderTitle + ', ' + title;
+      }
       num discount = productData['productData']['Discount'] ?? 0;
       num mrp = productData['productData']['MRP'] ?? 0;
       num is360degreeprice = productData['productData']['Wash360Price'] ?? 0;
@@ -627,19 +657,21 @@ if (orderTitle=='') {
 
       bool isYes = productData['UseTotalSpares'];
       String title = productData['productData']['Content']['Title'];
-if (orderTitle=='') {
-    orderTitle = title;
-} else {
-    orderTitle = orderTitle + ', ' + title;
-}
+      if (orderTitle == '') {
+        orderTitle = title;
+      } else {
+        orderTitle = orderTitle + ', ' + title;
+      }
 
       List benefits = productData['productData']['Content']['Benefits'];
       List images = productData['productData']['Content']['Images'];
+      List TotalSparesbenefits =
+          productData['productData']['Content']['TotalSpares'];
 
       num discount = productData['productData']['Content']['Discount'] ?? 0;
       num mrp = productData['productData']['Content']['MRP'] ?? 0;
       num totalSparesPrice =
-          productData['productData']['Content']['TotalSparesPrice'] ?? 0;
+          productData['productData']['Content']['TotalSparesMRP'] ?? 0;
       num discountedPrice = isYes
           ? (mrp + totalSparesPrice) -
               ((mrp + totalSparesPrice) * discount / 100)
@@ -651,6 +683,9 @@ if (orderTitle=='') {
         'productId': productId,
         'count': count,
         'title': title,
+        'SparesIncluded': isYes,
+        'SparesBenefits': TotalSparesbenefits,
+        'TotalSparesPrice': totalSparesPrice,
         'totalPrice': totalPrice,
         'benefits': benefits,
         'images': images,
@@ -668,6 +703,9 @@ if (orderTitle=='') {
       orderDetails['AMC'][productId] = {
         'count': productData['count'],
         'title': productData['title'],
+        'SparesIncluded': productData['SparesIncluded'],
+        'TotalSparesPrice': productData['TotalSparesPrice'],
+        'SparesBenefits': productData['SparesBenefits'],
         'totalPrice': productData['totalPrice'],
         'benefits': productData['benefits'],
         'images': productData['images'],
@@ -679,11 +717,12 @@ if (orderTitle=='') {
     return orderDetails;
   }
 
-  Future<void> placeOrder() async {
+  Future<void> placeOrder(String orderPayment) async {
     Map<String, dynamic> product = await productorderdetail();
     Map<String, dynamic> service = await serviceorderdetail();
     Map<String, dynamic> amc = await amcorderdetail();
     Map<String, dynamic> generalproduct = await generalproductorderdetail();
+    Timestamp time = Timestamp.now();
 
     List<Map<String, dynamic>> orderDetails = [
       amc,
@@ -743,13 +782,12 @@ if (orderTitle=='') {
       await reduceStockForProduct(widget.uid, product);
       await reduceStockForGeneralProduct(widget.uid, generalproduct);
       await FirebaseFirestore.instance
-          .collection('Users')
-          .doc(widget.uid)
-          .collection('Orders')
+          .collection('CurrentOrders')
           .doc(widget.uniqueid)
           .set({
         'OrderDetails': orderDetails,
-        'CreatedAt': Timestamp.now(),
+        'UID': widget.uid,
+        'CreatedAt': time,
         'email': email,
         'name': name,
         'lat': latitude,
@@ -758,8 +796,26 @@ if (orderTitle=='') {
         'contact': contact,
         'totalamount': widget.amount,
         'orderTitle': orderTitle,
+        'orderPayment': orderPayment,
       });
-
+      await FirebaseFirestore.instance
+          .collection('Users')
+          .doc(widget.uid)
+          .collection('Orders')
+          .doc(widget.uniqueid)
+          .set({
+        'OrderDetails': orderDetails,
+        'CreatedAt': time,
+        'email': email,
+        'name': name,
+        'lat': latitude,
+        'lon': longitude,
+        'address': address,
+        'contact': contact,
+        'totalamount': widget.amount,
+        'orderTitle': orderTitle,
+        'orderPayment': orderPayment,
+      });
       await storeAMCDataInFirestore(widget.uid);
       print(
           'Order details stored successfully with Order ID....: $orderDetails');
@@ -768,59 +824,117 @@ if (orderTitle=='') {
     }
   }
 
-  Future<void> storeAMCDataInFirestore(String uid) async {
-    // Call the amcorderdetail method to get the order details
-    Map<String, dynamic> orderDetails = amcorderdetail();
+Future<void> storeAMCDataInFirestore(String uid) async {
+  // Call the amcorderdetail method to get the order details
+  Map<String, dynamic> orderDetails = amcorderdetail();
 
-    // Construct the Firestore path
-    String firestorePath = 'Users/$uid/AMC Subscription';
-    Uuid uuid = Uuid();
+  // Construct the Firestore path
+  String firestorePath = 'Users/$uid/AMC Subscription';
+  Uuid uuid = Uuid();
 
-    // Iterate through the 'AMC' map in orderDetails
-    for (var entry in orderDetails['AMC'].entries) {
-      String productId = entry.key;
-      Map<String, dynamic> productData = entry.value;
-      int count = productData['count'];
+  // Iterate through the 'AMC' map in orderDetails
+  for (var entry in orderDetails['AMC'].entries) {
+    String productId = entry.key;
+    Map<String, dynamic> productData = entry.value;
+    int count = productData['count'];
 
-      // Create a new document under the productId
-      DocumentReference productRef =
-          FirebaseFirestore.instance.collection(firestorePath).doc(productId);
+    // Create a new document under the productId
+    DocumentReference productRef =
+        FirebaseFirestore.instance.collection(firestorePath).doc(productId);
 
-      // Iterate through the count to generate unique IDs
-      for (int i = 0; i < count; i++) {
-        String randomId = uuid.v4();
-        DateTime currentTimestamp = DateTime.now();
+    // Iterate through the count to generate unique IDs
+    for (int i = 0; i < count; i++) {
+      String randomId = uuid.v4();
+      DateTime currentTimestamp = DateTime.now();
 
-        // Calculate service intervals and build data map
-        Map<String, dynamic> dataToMerge = {
-          'Benefits': productData['benefits'],
-          'Images': productData['images'],
+      // Calculate service intervals and build data map
+      Map<String, dynamic> dataToMerge = {
+        'Benefits': productData['benefits'],
+        'Images': productData['images'],
+        'SparesIncluded': productData['SparesIncluded'],
+        'SparesBenefits': productData['SparesBenefits'],
+        'Claimed1': false,
+        'Claimed2': false,
+        'Claimed3': false,
+        'Claimed4': false,
+        'Avail': true,
+      };
+
+      // Define the service intervals (1, 2, 3 months)
+      List<int> serviceIntervals = [0, 4, 8, 12];
+
+      for (int interval in serviceIntervals) {
+        DateTime serviceTimestamp = addMonths(currentTimestamp, interval);
+        dataToMerge['Service$interval'] = {
+          'Timestamp': serviceTimestamp,
+          'IsDone': false
         };
-
-        // Define the service intervals (1, 2, 3 months)
-        List<int> serviceIntervals = [0, 4, 8, 12];
-
-        for (int interval in serviceIntervals) {
-          DateTime serviceTimestamp = addMonths(currentTimestamp, interval);
-          dataToMerge['Service$interval'] = {
-            'Timestamp': serviceTimestamp,
-            'IsDone': false
-          };
-        }
-
-        // Create a map with the randomId as key
-        Map<String, dynamic> dataToMergeWithId = {randomId: dataToMerge};
-
-        // Use set with merge option to add or update the data
-        await productRef.set(
-            {"SchemeCollection": dataToMergeWithId}, SetOptions(merge: true));
       }
 
-      // Set product title
-      await productRef
-          .set({'title': productData['title']}, SetOptions(merge: true));
+      // Create a map with the randomId as key
+      Map<String, dynamic> dataToMergeWithId = {randomId: dataToMerge};
+
+      // Use set with merge option to add or update the data
+      await productRef.set(
+          {"SchemeCollection": dataToMergeWithId}, SetOptions(merge: true));
+      
+      // Call storeAMCDataInadmin for each product
+      await storeAMCDataInadmin(
+          uid, name, contact, address, productId, randomId, productData);
     }
+
+    // Set product title
+    await productRef
+        .set({'title': productData['title']}, SetOptions(merge: true));
   }
+}
+
+Future<void> storeAMCDataInadmin(
+    String uid, String name, String contact, String address, String productId, String randomId, Map<String, dynamic> productData) async {
+  // Construct the Firestore path
+  String firestorePath = 'CurrentAMCSubscription';
+
+  // Create a new document for each product
+  DocumentReference productRef = FirebaseFirestore.instance
+      .collection(firestorePath)
+      .doc('$randomId');
+
+  DateTime currentTimestamp = DateTime.now();
+
+  // Calculate service intervals and build data map
+  Map<String, dynamic> dataToMerge = {
+    'Benefits': productData['benefits'],
+    'Images': productData['images'],
+    'SparesIncluded': productData['SparesIncluded'],
+    'SparesBenefits': productData['SparesBenefits'],
+    'Claimed': false,
+    'Name': name,
+    'Contact': contact,
+    'Address': address,
+    'Avail': true,
+    'Image':'',
+    'Title': productData['title'],
+    'UID': uid,
+  };
+
+  // Define the service intervals (1, 2, 3 months)
+  List<int> serviceIntervals = [0, 4, 8, 12];
+
+  for (int interval in serviceIntervals) {
+    DateTime serviceTimestamp = addMonths(currentTimestamp, interval);
+    dataToMerge['Service$interval'] = {
+      'Timestamp': serviceTimestamp,
+      'IsDone': false
+    };
+  }
+
+  // Set product title
+  dataToMerge['title'] = productData['title'];
+
+  // Use set to add the data
+  await productRef.set(dataToMerge);
+}
+
 
   DateTime addMonths(DateTime dateTime, int months) {
     return DateTime(

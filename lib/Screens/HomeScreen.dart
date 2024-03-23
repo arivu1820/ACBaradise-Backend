@@ -55,7 +55,7 @@ class HomeScreen extends StatelessWidget {
           children: [
             ServiceAndAMCContainer(uid: uid,),
             ExploreDivider(),
-            MyCartBanner(),
+            MyCartBanner(page: 'HomePage',),
             const SizedBox(
               height: 20,
             ),

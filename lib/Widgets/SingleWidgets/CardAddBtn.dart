@@ -441,7 +441,7 @@ class _CartAddBtnState extends State<CartAddBtn> {
                   borderRadius: BorderRadius.circular(5),
                   boxShadow: [
                     BoxShadow(
-                      color: brown50Color,
+                      color: brown25Color,
                       offset: Offset(0, 0),
                       blurRadius: 4,
                       spreadRadius: 0,

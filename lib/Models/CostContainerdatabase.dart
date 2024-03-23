@@ -6,8 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:acbaradise/Widgets/CombinedWidgets/HomePageProductsList.dart';
 
 class CostContainerDatabase {
-
- static  Future<Map<String, dynamic>> fetchCategoriesDetails(
+  static Future<Map<String, dynamic>> fetchCategoriesDetails(
       List<DocumentSnapshot> generalproductWidgets) async {
     Map<String, dynamic> categoriesDetails = {};
     num totalPrice = 0;
@@ -56,7 +55,6 @@ class CostContainerDatabase {
           totalPrice += (categoriesDetails[productId]['MRP'] ?? 0) *
               count *
               (1 - (categoriesDetails[productId]['Discount'] ?? 0) / 100);
-
         }
       }
     }
@@ -66,11 +64,10 @@ class CostContainerDatabase {
     categoriesDetails['totalDiscount'] = totaldiscount;
     categoriesDetails["productDataList"] = productDataList;
 
-
     return categoriesDetails;
   }
 
- static Future<Map<String, dynamic>> fetchGeneralProductsDetails(
+  static Future<Map<String, dynamic>> fetchGeneralProductsDetails(
       List<DocumentSnapshot> generalproductWidgets) async {
     Map<String, dynamic> categoriesDetails = {};
     num totalPrice = 0;
@@ -112,10 +109,6 @@ class CostContainerDatabase {
         totalPrice += (categoriesDetails[productId]['MRP'] ?? 0) *
             count *
             (1 - (categoriesDetails[productId]['Discount'] ?? 0) / 100);
-
-
-
-        
       }
     }
     // Add the total price to the categoriesDetails map
@@ -123,11 +116,10 @@ class CostContainerDatabase {
     categoriesDetails['totalDiscount'] = totaldiscount;
     categoriesDetails["productDataList"] = productDataList;
 
-
     return categoriesDetails;
   }
 
- static Future<Map<String, dynamic>> fetchserviceCategoriesDetails(
+  static Future<Map<String, dynamic>> fetchserviceCategoriesDetails(
     List<DocumentSnapshot> generalproductWidgets,
   ) async {
     Map<String, dynamic> categoriesDetails = {};
@@ -183,9 +175,9 @@ class CostContainerDatabase {
           // Determine the correct price field based on conditions
           num priceField = categoriesDetails[productId]['MRP'] ?? 0;
           if (collectionName == 'WetWash' && product['is360degree'] == true) {
-            totaldiscount += (categoriesDetails[productId]['Wash360MRP'] ?? 0) *
+            totaldiscount += (categoriesDetails[productId]['Wash360MRP'] ?? 0 + priceField) *
                     count -
-                (categoriesDetails[productId]['Wash360MRP'] ?? 0) *
+                (categoriesDetails[productId]['Wash360MRP'] ?? 0 + priceField) *
                     count *
                     (1 - (categoriesDetails[productId]['Discount'] ?? 0) / 100);
 
@@ -206,8 +198,6 @@ class CostContainerDatabase {
                 count *
                 (1 - (categoriesDetails[productId]['Discount'] ?? 0) / 100);
           }
-
-   
         }
       }
     }
@@ -217,11 +207,10 @@ class CostContainerDatabase {
     categoriesDetails['totalDiscount'] = totaldiscount;
     categoriesDetails["productDataList"] = productDataList;
 
-
     return categoriesDetails;
   }
 
- static Future<Map<String, dynamic>> fetchamcCategoriesDetails(
+  static Future<Map<String, dynamic>> fetchamcCategoriesDetails(
       List<DocumentSnapshot> generalproductWidgets) async {
     Map<String, dynamic> categoriesDetails = {};
     String docName = '5AMC';
@@ -264,12 +253,14 @@ class CostContainerDatabase {
         String priceField = 'MRP';
         num productPrice =
             categoriesDetails[productId]['Content'][priceField] ?? 0;
+        num sparesprice = categoriesDetails[productId]['Content']['TotalSparesMRP'] ?? 0;
         num discount =
             (categoriesDetails[productId]['Content']['Discount'] ?? 0) / 100;
 
         if (subcollectionName == 'AMC' && product['UseTotalSpares'] == true) {
           totalDiscount +=
-              (categoriesDetails[productId]['Content']['TotalSparesMRP'] ?? 0) *
+              (sparesprice + productPrice) *
+                  count - (sparesprice + productPrice) *
                   count *
                   (1 - discount);
           totalPrice +=
@@ -278,10 +269,11 @@ class CostContainerDatabase {
                   (1 - discount);
           totalPrice += productPrice * count * (1 - discount);
         } else {
-          totalDiscount += productPrice * count * (1 - discount);
+          totalDiscount += (productPrice) * count -
+              (productPrice) * count * (1 - (discount));
+          ;
           totalPrice += productPrice * count * (1 - discount);
         }
-
       }
     }
 
@@ -292,7 +284,7 @@ class CostContainerDatabase {
     return categoriesDetails;
   }
 
- static Future<Map<String, dynamic>> getTotalDiscount(String uid) async {
+  static Future<Map<String, dynamic>> getTotalDiscount(String uid) async {
     final Map<String, dynamic> allincart = {};
     // Fetch details for Products
     List<DocumentSnapshot> productWidgets = await FirebaseFirestore.instance

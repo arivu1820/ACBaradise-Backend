@@ -44,6 +44,8 @@ class OrdersScreen extends StatelessWidget {
               String contact = orderData['contact'];
               String address = orderData['address'];
               String orderTitle = orderData['orderTitle'] ?? '';
+                            String orderpayment = orderData['orderPayment'] ?? '';
+
               DateTime dateTime = CreatedAt.toDate();
               List orderdetails = orderData['OrderDetails'];
 
@@ -64,11 +66,12 @@ class OrdersScreen extends StatelessWidget {
                     );
                   },
                   child: ACPContainer(
-                      ifTrue: true,
+                      orderPayment: orderpayment,
                       CreatedAt: dateTime,
                       OrderTitle: orderTitle,
                       OrderId: OrderId,
                       TotalPrice: TotalPrice));
+                      
             },
           );
         },

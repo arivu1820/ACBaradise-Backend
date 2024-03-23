@@ -2,7 +2,6 @@ import 'package:acbaradise/Models/CostContainerdatabase.dart';
 import 'package:acbaradise/Theme/Colors.dart';
 import 'package:acbaradise/Widgets/CombinedWidgets/AMCInCart.dart';
 import 'package:acbaradise/Widgets/CombinedWidgets/GeneralProductsInCart.dart';
-import 'package:acbaradise/Widgets/CombinedWidgets/PaymentMethod.dart';
 import 'package:acbaradise/Widgets/CombinedWidgets/ProductsInCart.dart';
 import 'package:acbaradise/Widgets/CombinedWidgets/ServicesInCard.dart';
 import 'package:acbaradise/Widgets/SingleWidgets/AppbarWithCart.dart';
@@ -12,7 +11,6 @@ import 'package:acbaradise/Widgets/SingleWidgets/MyCartBanner.dart';
 import 'package:acbaradise/Widgets/SingleWidgets/SelectAnAddress.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:intl/intl.dart';
 
 class MyCartScreen extends StatefulWidget {
@@ -43,7 +41,7 @@ class _MyCartScreenState extends State<MyCartScreen> {
                   child: SingleChildScrollView(
                     child: Column(
                       children: [
-                        MyCartBanner(),
+                        MyCartBanner(page: 'MyCartPage',),
                         Padding(
                           padding: const EdgeInsets.only(
                               top: 30, right: 40, left: 40, bottom: 30),
@@ -490,7 +488,7 @@ class AMCCartDetails extends StatelessWidget {
                   children: [
                     Expanded(
                       child: Text(
-                        "AMC",
+                        "Annual Contract",
                         style: TextStyle(
                           fontFamily: 'LexendLight',
                           fontSize: 14,
@@ -618,27 +616,7 @@ class ContinueToPaymentSection extends StatelessWidget {
       future: CostContainerDatabase.getTotalDiscount(uid),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(
-            child: Container(
-              padding: EdgeInsets.all(20.0),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(10.0),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.withOpacity(0.5),
-                    spreadRadius: 2,
-                    blurRadius: 5,
-                    offset: Offset(0, 3), // changes position of shadow
-                  ),
-                ],
-              ),
-              child: SpinKitFadingCircle(
-                color: darkBlue50Color,
-                size: 50.0,
-              ),
-            ),
-          );
+          return const Center(child: CircularProgressIndicator(color: darkBlueColor,strokeWidth: 2,),);
         } else if (snapshot.hasError) {
           return Text("Try after some time");
         } else {

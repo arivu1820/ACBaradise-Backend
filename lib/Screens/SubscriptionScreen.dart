@@ -11,6 +11,8 @@ class SubscriptionScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+            backgroundColor: whiteColor,
+
       appBar: AppbarWithCart(
         PageName: "Annual Contract Subscription",
         iscart: true,
@@ -27,7 +29,12 @@ class SubscriptionScreen extends StatelessWidget {
                   .snapshots(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return CircularProgressIndicator(); // or any loading indicator
+                  return Center(child: Column(
+                    children: [
+                      const SizedBox(height: 30,),
+                      CircularProgressIndicator(color: darkBlueColor,strokeWidth: 2,),
+                    ],
+                  )); // or any loading indicator
                 }
 
                 if (snapshot.hasError) {
@@ -36,7 +43,7 @@ class SubscriptionScreen extends StatelessWidget {
 
                 // If the data is not available, you can show a placeholder
                 if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                  return Text('No data available');
+                  return Center(child: Expanded(child: Text('Purchase a subscription for unlimited features for your AC')));
                 }
 
                 // If data is available, use ListView.builder

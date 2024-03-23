@@ -17,14 +17,37 @@ class SubscriptionScheme extends StatefulWidget {
 
 class _SubscriptionSchemeState extends State<SubscriptionScheme> {
   bool _isExpanded = false;
-  bool _isClaim = true;
   bool isService = true;
+  int count = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchCount();
+  }
+
+  Future<void> fetchCount() async {
+    Map<String, dynamic>? schemeCollection =
+        widget.document['SchemeCollection'] as Map<String, dynamic>?;
+
+    if (schemeCollection != null) {
+      // Iterate through all scheme IDs
+      for (var id in schemeCollection.keys) {
+        // Check if 'Avail' is true under each ID
+        if (schemeCollection[id]['Avail'] == true) {
+          count++;
+        }
+      }
+    }
+
+    setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
     String schemeTitle = widget.document['title']; // Adjust the field name
-    int qty = widget.document['SchemeCollection']?.length ??
-        0; // Adjust the field name
+    int qty = widget.document['SchemeCollection']?.length ?? 0;
+    // Adjust the field name
 
     return IntrinsicHeight(
       child: AnimatedContainer(
@@ -79,7 +102,7 @@ class _SubscriptionSchemeState extends State<SubscriptionScheme> {
               children: [
                 Expanded(
                   child: Text(
-                    "1 annual service not yet completed",
+                    "$count annual service not yet completed",
                     style: TextStyle(
                       color: leghtGreen,
                       fontFamily: "LexendLight",
@@ -134,10 +157,15 @@ class _SubscriptionSchemeState extends State<SubscriptionScheme> {
                           isService: true,
                           uid: widget.uid,
                           id: currentKey,
+                          includeservice: schemeData['SparesIncluded'] ?? false,
                           benefitsList: schemeData['Benefits'] ?? [],
                           imagesList: schemeData['Images'] ?? [],
                           service1Timestamp: schemeData['Service0']
                               ?['Timestamp'],
+                          Claimed1: schemeData['Claimed1'] ?? false,
+                          Claimed2: schemeData['Claimed2'] ?? false,
+                          Claimed3: schemeData['Claimed3'] ?? false,
+                          Claimed4: schemeData['Claimed4'] ?? false,
                           service2Timestamp: schemeData['Service4']
                               ?['Timestamp'],
                           service3Timestamp: schemeData['Service8']
@@ -148,7 +176,7 @@ class _SubscriptionSchemeState extends State<SubscriptionScheme> {
                           isDone2: schemeData['Service4']?['IsDone'],
                           isDone3: schemeData['Service8']?['IsDone'],
                           isDone4: schemeData['Service12']?['IsDone'],
-                          docid: currentKey,
+                          docid: widget.document.id,
                         );
                       } else {
                         // Handle the case where schemeData is null or missing keys

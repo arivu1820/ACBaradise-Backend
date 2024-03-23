@@ -29,13 +29,16 @@ class HomePageSeeMoreContainer extends StatelessWidget {
         children: [
           Padding(
             padding: const EdgeInsets.only(top: 10, left: 15, right: 15),
-            child: Text(
-              "See more",
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontFamily: "OxygenBold",
-                fontSize: 14,
-                color: blackColor,
+            child: FittedBox(
+              fit: BoxFit.contain,
+              child: Text(
+                "See more",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontFamily: "OxygenBold",
+                  fontSize: 14,
+                  color: blackColor,
+                ),
               ),
             ),
           ),

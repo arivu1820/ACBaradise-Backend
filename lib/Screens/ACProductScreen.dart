@@ -1,4 +1,5 @@
 import 'package:acbaradise/Models/DataBaseHelper.dart';
+import 'package:acbaradise/Widgets/CombinedWidgets/GeneralProductsList.dart';
 import 'package:acbaradise/Widgets/CombinedWidgets/HomePageProductsList.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -146,6 +147,10 @@ class ACProductScreen extends StatelessWidget {
                 const SizedBox(
                   height: 20,
                 ),
+
+                            GeneralProductsList(uid:uid!),
+                            const SizedBox(height: 30,),
+
                 // Add the rest of your widgets here
                 ],
               ),

@@ -6,7 +6,8 @@ import 'package:flutter/material.dart';
 
 class AMCAdvantages extends StatelessWidget {
   final bool isOnlyAdvantages;
-final int discount;
+  final bool includeservice;
+  final int discount;
   final int mrp;
   final int TotalSparesMRP;
   final String title;
@@ -18,6 +19,7 @@ final int discount;
 
   AMCAdvantages(
       {required this.isOnlyAdvantages,
+      this.includeservice = false,
       required this.mrp,
       required this.discount,
       required this.title,
@@ -36,6 +38,7 @@ final int discount;
           child: Padding(
             padding: const EdgeInsets.all(20),
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
                   children: [
@@ -61,35 +64,51 @@ final int discount;
                     )
                   ],
                 ),
+                if (isOnlyAdvantages && includeservice)
+                  Text(
+                    'Inculde Total Spares',
+                    style: TextStyle(
+                        fontFamily: 'LexendRegular',
+                        fontSize: 14,
+                        color: leghtGreen),
+                  ),
                 Container(
-                  margin: const EdgeInsets.only(top: 20),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(5),
-                    border: Border.all(color: lightBlueColor),
-                  ),
-                  width: double.infinity,
-                  child: ListView.builder(
-                    shrinkWrap: true,
-                    physics: NeverScrollableScrollPhysics(),
-                    itemBuilder: (context, index) {
-                      // Check if the index is within the bounds of the images list
-                      if (index % 2 == 0) {
-                        return AdvantagesContainer(
-                          showImageFirst: true,
-                          imageurl: images![index],
-                          content: benefits![index],
-                        );
-                      } else {
-                        return AdvantagesContainer(
-                          showImageFirst: false,
-                          imageurl: images![index],
-                          content: benefits![index],
-                        );
-                      }
-                    },
-                    itemCount: images?.length ?? 0,
-                  ),
-                ),
+                    margin: const EdgeInsets.only(top: 20),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(5),
+                      border: Border.all(color: lightBlueColor),
+                    ),
+                    width: double.infinity,
+                    child: ListView.builder(
+                      shrinkWrap: true,
+                      physics: NeverScrollableScrollPhysics(),
+                      itemBuilder: (context, index) {
+                        // Check if the index is within the bounds of the images list
+                        if (index < (images?.length ?? 0)) {
+                          if (index % 2 == 0) {
+                            return AdvantagesContainer(
+                              showImageFirst: true,
+                              imageurl: images![index],
+                              content: benefits![index],
+                            );
+                          } else {
+                            return AdvantagesContainer(
+                              showImageFirst: false,
+                              imageurl: images![index],
+                              content: benefits![index],
+                            );
+                          }
+                        } else if (index == (images?.length ?? 0)) {
+                          // Add SizedBox after the last item
+                          return SizedBox(height: 30);
+                        } else {
+                          // Handle invalid index, such as out of bounds
+                          return SizedBox(); // Or any other fallback widget
+                        }
+                      },
+                      itemCount:
+                          (images?.length ?? 0) + 1, // Add 1 for the SizedBox
+                    )),
                 isOnlyAdvantages
                     ? const SizedBox(
                         height: 20,

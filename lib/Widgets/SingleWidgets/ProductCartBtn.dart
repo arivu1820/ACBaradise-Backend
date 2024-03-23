@@ -1,4 +1,5 @@
 import 'package:acbaradise/Models/DataBaseHelper.dart';
+import 'package:acbaradise/Screens/MyCartScreen.dart';
 import 'package:acbaradise/Theme/Colors.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -76,23 +77,31 @@ class _ProductCartBtnState extends State<ProductCartBtn> {
                 }
               }
             },
-      child:widget.stock > 0? Container(
-        height: 40,
-        width: 200,
-        margin: const EdgeInsets.only(right: 10),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(5),
-          color: iscarted ? lightBlue50Color : null,
-          gradient: iscarted ? null : Light2darkblueLRgradient,
-        ),
-        child: Center(
-          child: Text(
-            iscarted ? "Added" : "Add To Cart",
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              fontSize: 12,
-              fontFamily: "LexendMedium",
-              color: blackColor,
+      child:widget.stock > 0? GestureDetector(
+         onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => MyCartScreen(uid: widget.uid),
+                ),
+              ),
+        child: Container(
+          height: 40,
+          width: 200,
+          margin: const EdgeInsets.only(right: 10),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(5),
+            color: iscarted ? lightBlue50Color : null,
+            gradient: iscarted ? null : Light2darkblueLRgradient,
+          ),
+          child: Center(
+            child: Text(
+              iscarted ? "Go To Cart" : "Add To Cart",
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontSize: 12,
+                fontFamily: "LexendMedium",
+                color: blackColor,
+              ),
             ),
           ),
         ),

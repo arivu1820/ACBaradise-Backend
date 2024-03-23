@@ -1,9 +1,11 @@
 import 'package:acbaradise/Models/DataBaseHelper.dart';
+import 'package:acbaradise/Screens/MyCartScreen.dart';
 import 'package:acbaradise/Theme/Colors.dart';
 import 'package:acbaradise/Widgets/CombinedWidgets/AMCAdvantages.dart';
 import 'package:acbaradise/Widgets/SingleWidgets/AMCTotalSparesContainer.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 
 class AdvantagesCostandSpares extends StatefulWidget {
@@ -42,22 +44,33 @@ class _AdvantagesCostandSparesState extends State<AdvantagesCostandSpares> {
     checkProductInCart();
   }
 
-  Future<void> checkProductInCart() async {
-    try {
-      QuerySnapshot cartSnapshot = await FirebaseFirestore.instance
-          .collection('Users')
-          .doc(widget.uid)
-          .collection('AMCCart')
-          .get();
+Future<void> checkProductInCart() async {
+  try {
+    QuerySnapshot cartSnapshot = await FirebaseFirestore.instance
+        .collection('Users')
+        .doc(widget.uid)
+        .collection('AMCCart')
+        .get();
 
-      setState(() {
-        isProductInCart =
-            cartSnapshot.docs.any((doc) => doc.id == widget.Serviceid);
-      });
-    } catch (error) {
-      print('Error checking product in cart: $error');
+    bool productFound = cartSnapshot.docs.any((doc) => doc.id == widget.Serviceid);
+
+    if (productFound) {
+      // If product is found, get the document corresponding to the service ID
+      var productDoc = cartSnapshot.docs.firstWhere((doc) => doc.id == widget.Serviceid);
+      
+      // Check the value of 'UseTotalSpares' field in the document
+      isSelected = productDoc['UseTotalSpares']; // Default to false if 'UseTotalSpares' doesn't exist or is null
     }
+
+    setState(() {
+      isProductInCart = productFound;
+      isSelected = isSelected;
+    });
+  } catch (error) {
+    print('Error checking product in cart: $error');
   }
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -90,9 +103,11 @@ class _AdvantagesCostandSparesState extends State<AdvantagesCostandSpares> {
                       width: 10,
                     )),
                     GestureDetector(
-                      onTap:isProductInCart?(){}: () => setState(() {
-                        isSelected = !isSelected;
-                      }),
+                      onTap: isProductInCart
+                          ? () {}
+                          : () => setState(() {
+                                isSelected = !isSelected;
+                              }),
                       child: isSelected
                           ? Container(
                               height: 30,
@@ -180,14 +195,17 @@ class _AdvantagesCostandSparesState extends State<AdvantagesCostandSpares> {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        Text(
-                          isSelected
-                              ? '₹ ${NumberFormat('#,##,###').format(((widget.mrp+widget.TotalSparesMRP) - ((widget.mrp+widget.TotalSparesMRP) * widget.discount / 100)).ceilToDouble())}  '
-                              : '₹ ${NumberFormat('#,##,###').format((widget.mrp - (widget.mrp * widget.discount / 100)).ceilToDouble())}  ',
-                          style: const TextStyle(
-                              fontFamily: "LexendMedium",
-                              fontSize: 30,
-                              color: blackColor),
+                        FittedBox(
+                          fit: BoxFit.contain,
+                          child: Text(
+                            isSelected
+                                ? '₹ ${NumberFormat('#,##,###').format(((widget.mrp + widget.TotalSparesMRP) - ((widget.mrp + widget.TotalSparesMRP) * widget.discount / 100)).ceilToDouble())}  '
+                                : '₹ ${NumberFormat('#,##,###').format((widget.mrp - (widget.mrp * widget.discount / 100)).ceilToDouble())}  ',
+                            style: const TextStyle(
+                                fontFamily: "LexendMedium",
+                                fontSize: 30,
+                                color: blackColor),
+                          ),
                         ),
                         Text(
                           isSelected
@@ -209,16 +227,13 @@ class _AdvantagesCostandSparesState extends State<AdvantagesCostandSpares> {
               Expanded(
                   child: GestureDetector(
                 onTap: isProductInCart
-                    ? () {                    
-}
+                    ? () {}
                     : () async {
-                      
                         String uid = widget.uid;
                         Map<String, dynamic> productDetails = {
                           'count': 1,
                           'UseTotalSpares': isSelected
                         };
-                     
 
                         try {
                           await DatabaseHelper.addToAMCCart(
@@ -228,35 +243,41 @@ class _AdvantagesCostandSparesState extends State<AdvantagesCostandSpares> {
                           );
 
                           checkProductInCart();
-
                         } catch (error) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               content: Text('Error adding to cart: $error'),
                             ),
                           );
-
                         }
                       },
                 child: isProductInCart
-                    ? Container(
-                        height: 100,
-                        color: lightBlue50Color,
-                        child: Center(
-                            child: Text(
-                          "Added",
-                          style: const TextStyle(
-                              fontFamily: "LexendMedium",
-                              fontSize: 16,
-                              color: blackColor),
-                        )),
+                    ? GestureDetector(
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => MyCartScreen(uid: widget.uid),
+                          ),
+                        ),
+                        child: Container(
+                          height: 100,
+                          color: lightBlueColor,
+                          child: Center(
+                              child: Text(
+                            "Go To Cart",
+                            style: const TextStyle(
+                                fontFamily: "LexendMedium",
+                                fontSize: 16,
+                                color: blackColor),
+                          )),
+                        ),
                       )
                     : Container(
                         height: 100,
                         color: darkBlueColor,
                         child: Center(
                             child: Text(
-                          "Add to cart",
+                          "Add To Cart",
                           style: const TextStyle(
                               fontFamily: "LexendMedium",
                               fontSize: 16,

@@ -30,6 +30,8 @@ class OrdersProductScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+            backgroundColor: whiteColor,
+
       appBar: AppbarWithCart(
         PageName: "Orders",
         iscart: true,

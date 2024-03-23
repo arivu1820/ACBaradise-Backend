@@ -2,7 +2,8 @@ import 'package:acbaradise/Theme/Colors.dart';
 import 'package:flutter/material.dart';
 
 class ServiceClaim extends StatelessWidget {
-  const ServiceClaim({super.key});
+  final VoidCallback checkfunction;
+  const ServiceClaim({super.key, required this.checkfunction});
 
   @override
   Widget build(BuildContext context) {
@@ -48,7 +49,7 @@ class ServiceClaim extends StatelessWidget {
                         color: darkBlueColor,
                       )),
                   onPressed: () {
-                    // Handle the actual removal logic here
+                   checkfunction();
                     Navigator.of(context)
                         .pop(); // Close the dialog after removal
                   },

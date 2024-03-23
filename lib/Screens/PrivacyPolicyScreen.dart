@@ -1,3 +1,4 @@
+import 'package:acbaradise/Theme/Colors.dart';
 import 'package:acbaradise/Widgets/SingleWidgets/AppbarWithCart.dart';
 import 'package:flutter/material.dart';
 
@@ -8,6 +9,8 @@ class PrivacyPolicyScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+            backgroundColor: whiteColor,
+
       appBar: AppbarWithCart(PageName: 'T&C Privacy Policy', iscart: false, uid: uid),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(16.0),

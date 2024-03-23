@@ -14,7 +14,7 @@ ServicePageBanner({required this.Imageurl});
     return Container(
       width: double.infinity,
       height: screenWidth*0.5,
-      color: black50Color,
+      color: black5Color,
       child: Image.network(Imageurl,
         width: double.infinity,
         height: 200,fit: BoxFit.cover,

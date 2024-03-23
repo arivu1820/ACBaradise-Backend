@@ -1,4 +1,5 @@
 import 'package:acbaradise/Models/DataBaseHelper.dart';
+import 'package:acbaradise/Screens/MyCartScreen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:acbaradise/Theme/Colors.dart';
@@ -53,7 +54,12 @@ class _ProductLargeCartBtnState extends State<ProductLargeCartBtn> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: isProductInCart
-          ? () {}
+          ? () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => MyCartScreen(uid: widget.uid)));
+            }
           : () async {
               if (widget.stock > 0) {
                 String uid = widget.uid;
@@ -77,54 +83,57 @@ class _ProductLargeCartBtnState extends State<ProductLargeCartBtn> {
                 }
               }
             },
-      child:widget.stock > 0 ?Container(
-        height: 60,
-        width: double.infinity,
-        margin: const EdgeInsets.only(left: 20, right: 20, top: 20),
-        decoration: isProductInCart
-            ? BoxDecoration(
-                borderRadius: BorderRadius.circular(5),
-                color: lightBlue50Color,
-              )
-            : BoxDecoration(
-                borderRadius: BorderRadius.circular(5),
-                gradient: Light2darkblueLRgradient,
+      child: widget.stock > 0
+          ? Container(
+              height: 60,
+              width: double.infinity,
+              margin: const EdgeInsets.only(left: 20, right: 20, top: 20),
+              decoration: isProductInCart
+                  ? BoxDecoration(
+                      borderRadius: BorderRadius.circular(5),
+                      color: lightBlue50Color,
+                    )
+                  : BoxDecoration(
+                      borderRadius: BorderRadius.circular(5),
+                      gradient: Light2darkblueLRgradient,
+                    ),
+              child: Center(
+                child: Text(
+                  isProductInCart ? "Go To Cart" : "Add To Cart",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontFamily: "LexendMedium",
+                    color: blackColor,
+                  ),
+                ),
               ),
-        child: Center(
-          child: Text(
-            isProductInCart ? "Added" : "Add To Cart",
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 16,
-              fontFamily: "LexendMedium",
-              color: blackColor,
-            ),
-          ),
-        ),
-      ):Container(
-        height: 60,
-        width: double.infinity,
-        margin: const EdgeInsets.only(left: 20, right: 20, top: 20),
-        decoration: isProductInCart
-            ? BoxDecoration(
-                borderRadius: BorderRadius.circular(5),
-                color: darkGrey50Color,
-              )
-            : BoxDecoration(
-                borderRadius: BorderRadius.circular(5),
-                color: darkGrey50Color,
+            )
+          : Container(
+              height: 60,
+              width: double.infinity,
+              margin: const EdgeInsets.only(left: 20, right: 20, top: 20),
+              decoration: isProductInCart
+                  ? BoxDecoration(
+                      borderRadius: BorderRadius.circular(5),
+                      color: darkGrey50Color,
+                    )
+                  : BoxDecoration(
+                      borderRadius: BorderRadius.circular(5),
+                      color: darkGrey50Color,
+                    ),
+              child: Center(
+                child: Text(
+                  'Out of Stock',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontFamily: "LexendMedium",
+                    color: blackColor,
+                  ),
+                ),
               ),
-        child: Center(
-          child: Text('Out of Stock',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 16,
-              fontFamily: "LexendMedium",
-              color: blackColor,
             ),
-          ),
-        ),
-      ),
     );
   }
 }

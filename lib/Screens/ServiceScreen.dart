@@ -33,7 +33,12 @@ class ServiceScreen extends StatelessWidget {
               builder: (context, serviceSnapshot) {
                 if (serviceSnapshot.connectionState ==
                     ConnectionState.waiting) {
-                  return CircularProgressIndicator();
+                  return Center(child: Column(
+                    children: [
+                      const SizedBox(height: 30,),
+                      CircularProgressIndicator(color: darkBlueColor,strokeWidth: 2,),
+                    ],
+                  )); 
                 }
 
                 if (serviceSnapshot.hasError) {
@@ -58,7 +63,12 @@ class ServiceScreen extends StatelessWidget {
                       builder: (context, categorySnapshot) {
                         if (categorySnapshot.connectionState ==
                             ConnectionState.waiting) {
-                          return CircularProgressIndicator();
+                          return Center(child: Column(
+                    children: [
+                      const SizedBox(height: 30,),
+                      CircularProgressIndicator(color: darkBlueColor,strokeWidth: 2,),
+                    ],
+                  )); 
                         }
 
                         if (categorySnapshot.hasError) {

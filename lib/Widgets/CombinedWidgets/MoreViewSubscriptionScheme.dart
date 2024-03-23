@@ -13,6 +13,7 @@ class MoreViewSubscriptionScheme extends StatelessWidget {
   final String uid;
   final List benefitsList;
   final List imagesList;
+  final bool includeservice;
 
   final Timestamp service1Timestamp;
   final Timestamp service2Timestamp;
@@ -22,13 +23,18 @@ class MoreViewSubscriptionScheme extends StatelessWidget {
   final bool isDone2;
   final bool isDone3;
   final bool isDone4;
+  final bool Claimed1;
+  final bool Claimed2;
+  final bool Claimed3;
+  final bool Claimed4;
   final String docid;
   final String id;
 
-  const MoreViewSubscriptionScheme({
+  MoreViewSubscriptionScheme({
     Key? key,
     required this.isService,
     required this.id,
+    this.includeservice = false,
     required this.uid,
     required this.benefitsList,
     required this.imagesList,
@@ -37,15 +43,32 @@ class MoreViewSubscriptionScheme extends StatelessWidget {
     required this.service2Timestamp,
     required this.service3Timestamp,
     required this.service4Timestamp,
+    required this.Claimed1,
+    required this.Claimed2,
+    required this.Claimed3,
+    required this.Claimed4,
     required this.isDone1,
     required this.isDone2,
     required this.isDone3,
     required this.isDone4,
   }) : super(key: key);
 
+  DateTime now = DateTime.now();
+
   @override
   Widget build(BuildContext context) {
     final smallscreenwidth = MediaQuery.of(context).size.width < 280;
+    bool showServiceClaim = false;
+
+    // Check if any of the service timestamps fall within the current month
+    if ((service1Timestamp.toDate().month == now.month && service1Timestamp.toDate().year == now.year && !Claimed1) ||
+    (service2Timestamp.toDate().month == now.month && service2Timestamp.toDate().year == now.year && !Claimed2) ||
+    (service3Timestamp.toDate().month == now.month && service3Timestamp.toDate().year == now.year && !Claimed3) ||
+    (service4Timestamp.toDate().month == now.month && service4Timestamp.toDate().year == now.year && !Claimed4)) {
+  showServiceClaim = true;
+}
+
+
     return Container(
       decoration: BoxDecoration(
         color: whiteColor,
@@ -118,6 +141,7 @@ class MoreViewSubscriptionScheme extends StatelessWidget {
                               ),
                             ),
                             child: AMCAdvantages(
+                              includeservice: includeservice,
                               isOnlyAdvantages: true,
                               images: imagesList,
                               title: "",
@@ -147,23 +171,96 @@ class MoreViewSubscriptionScheme extends StatelessWidget {
             ),
           ),
           SizedBox(height: 10),
-          isService
-              ? Row(
-                  children: [
-                    CopyBox(
-                      id: id,
-                    ),
-                    smallscreenwidth ? SizedBox() : ServiceClaim()
-                  ],
-                )
-              : SafeArea(
-                  child: CopyBox(
-                  id: id,
-                )),
-          smallscreenwidth ? ServiceClaim() : SizedBox()
+          Row(
+            children: [
+              CopyBox(
+                id: id,
+              ),
+              smallscreenwidth
+                  ? SizedBox()
+                  : showServiceClaim
+                      ? ServiceClaim(
+                          checkfunction: checkfunction,
+                        )
+                      : SizedBox(),
+              smallscreenwidth
+                  ? showServiceClaim
+                      ? ServiceClaim(
+                          checkfunction: checkfunction,
+                        )
+                      : SizedBox()
+                  : SizedBox()
+            ],
+          )
         ],
       ),
     );
+  }
+
+  void checkfunction() {
+    if (service1Timestamp.toDate().month == now.month) {
+      // Update Service1 timestamp
+      updateServiceTimestamp(docid, 'Service0');
+    } else if (service2Timestamp.toDate().month == now.month) {
+      // Update Service2 timestamp
+      updateServiceTimestamp(docid, 'Service4');
+    } else if (service3Timestamp.toDate().month == now.month) {
+      // Update Service3 timestamp
+      updateServiceTimestamp(docid, 'Service8');
+    } else if (service4Timestamp.toDate().month == now.month) {
+      // Update Service4 timestamp
+      updateServiceTimestamp(docid, 'Service12');
+    }
+  }
+
+  // Function to update the service timestamp in Firestore
+  Future<void> updateServiceTimestamp(String docId, String serviceField) async {
+    try {
+      // Update the corresponding service timestamp in Firestore
+      await FirebaseFirestore.instance
+          .collection('CurrentAMCSubscription')
+          .doc(docId)
+          .set({
+        serviceField: {'Timestamp': Timestamp.now()}
+      }, SetOptions(merge: true));
+
+      // Update claimed status under Users -> uid -> AMC Subscription
+      // Determine the claimed status field based on the serviceField parameter
+      String claimedField;
+      switch (serviceField) {
+        case 'Service0':
+          claimedField = 'Claimed1';
+          break;
+        case 'Service4':
+          claimedField = 'Claimed2';
+          break;
+        case 'Service8':
+          claimedField = 'Claimed3';
+          break;
+        case 'Service12':
+          claimedField = 'Claimed4';
+          break;
+        default:
+          claimedField = ''; // Handle other cases if needed
+      }
+
+      // Update claimed status under Users -> uid -> AMC Subscription
+      await FirebaseFirestore.instance
+          .collection('Users')
+          .doc(uid)
+          .collection('AMC Subscription')
+          .doc(docId)
+          .set({
+        'SchemeCollection': {
+          id: {claimedField: true}
+        }
+      }, SetOptions(merge: true));
+
+      print('done');
+    } catch (e) {
+      print('Error updating service timestamp: $e');
+      // Handle error as needed
+    }
   }
 
   String formatDate(Timestamp timestamp) {
