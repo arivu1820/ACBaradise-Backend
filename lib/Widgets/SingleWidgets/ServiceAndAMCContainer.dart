@@ -116,7 +116,7 @@ class ServiceAndAMCContainer extends StatelessWidget {
                     margin: const EdgeInsets.only(
                         top: 5, left: 10, right: 10, bottom: 20),
                     child: Text(
-                      "Annual Contract",
+                      "AMC",
                       style: TextStyle(
                           color: blackColor,
                           fontFamily: "LexendLight",

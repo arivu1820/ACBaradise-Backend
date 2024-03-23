@@ -175,9 +175,9 @@ class CostContainerDatabase {
           // Determine the correct price field based on conditions
           num priceField = categoriesDetails[productId]['MRP'] ?? 0;
           if (collectionName == 'WetWash' && product['is360degree'] == true) {
-            totaldiscount += (categoriesDetails[productId]['Wash360MRP'] ?? 0 + priceField) *
+            totaldiscount += ((categoriesDetails[productId]['Wash360MRP'] ?? 0) + priceField) *
                     count -
-                (categoriesDetails[productId]['Wash360MRP'] ?? 0 + priceField) *
+                ((categoriesDetails[productId]['Wash360MRP'] ?? 0) + priceField) *
                     count *
                     (1 - (categoriesDetails[productId]['Discount'] ?? 0) / 100);
 

@@ -1,3 +1,4 @@
+
 import 'package:acbaradise/Theme/Colors.dart';
 import 'package:flutter/material.dart';
 
@@ -49,9 +50,10 @@ class ServiceClaim extends StatelessWidget {
                         color: darkBlueColor,
                       )),
                   onPressed: () {
-                   checkfunction();
                     Navigator.of(context)
-                        .pop(); // Close the dialog after removal
+                        .pop(); 
+                                            checkfunction();
+// Close the dialog after removal
                   },
                 ),
               ],

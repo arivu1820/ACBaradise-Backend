@@ -28,7 +28,7 @@ class _AnnualContractScreenState extends State<AnnualContractScreen> {
     return Scaffold(
       backgroundColor: whiteColor,
       appBar: AppbarWithCart(
-        PageName: "Annual Contract",
+        PageName: "AMC",
         iscart: true,
         uid: widget.uid,
       ),

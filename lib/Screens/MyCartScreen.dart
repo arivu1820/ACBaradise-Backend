@@ -488,7 +488,7 @@ class AMCCartDetails extends StatelessWidget {
                   children: [
                     Expanded(
                       child: Text(
-                        "Annual Contract",
+                        "AMC",
                         style: TextStyle(
                           fontFamily: 'LexendLight',
                           fontSize: 14,

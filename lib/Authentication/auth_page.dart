@@ -6,6 +6,7 @@ import 'package:acbaradise/Theme/Colors.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:package_info/package_info.dart';
 
 class AuthPage extends StatelessWidget {
   @override
@@ -32,6 +33,7 @@ class AuthPage extends StatelessWidget {
                         // If the Future is still waiting for data, return a loading indicator
                         return SplashScreen();
                       } else {
+                        
                         // Document exists, navigate to HomeScreen
                         return HomeScreen(uid: currentUserUID);
                       }
@@ -52,4 +54,6 @@ class AuthPage extends StatelessWidget {
       ),
     );
   }
+
+
 }

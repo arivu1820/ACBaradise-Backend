@@ -8,6 +8,8 @@ import "package:acbaradise/Theme/Colors.dart";
 import 'package:acbaradise/Widgets/CombinedWidgets/CashonDelivery.dart';
 import 'package:flutter/widgets.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
+import 'package:url_launcher/link.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:uuid/uuid.dart';
 
 class PaymentScreen extends StatefulWidget {
@@ -113,18 +115,45 @@ class _PaymentScreenState extends State<PaymentScreen> {
     setState(() {
       issubmited = false;
     });
-    const snackDemo = SnackBar(
-      content: Text("Payment failed. Contact support center for quries"),
-      backgroundColor: brownColor,
-      elevation: 10,
-      behavior: SnackBarBehavior.floating,
-      margin: EdgeInsets.all(5),
-      duration: Duration(seconds: 5),
-    );
-    ScaffoldMessenger.of(context).removeCurrentSnackBar();
-    ScaffoldMessenger.of(context).showSnackBar(snackDemo);
 
-    // Do something when payment fails
+    ScaffoldMessenger.of(context).removeCurrentSnackBar();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: GestureDetector(
+          onTap: () {
+            launch('https://acbaradise.com/support');
+          },
+          child: Row(
+            children: [
+              Text(
+                "Payment failed. ",
+                style: TextStyle(color: whiteColor),
+              ),
+              Text(
+                "Contact support center ",
+                style: TextStyle(
+                  color: whiteColor,
+                  decoration: TextDecoration.underline,
+                            decorationColor: whiteColor,
+
+                ),
+              ),
+              Text(
+                "for queries",
+                style: TextStyle(
+                  color: whiteColor,
+                ),
+              ),
+            ],
+          ),
+        ),
+        backgroundColor: brownColor,
+        elevation: 10,
+        behavior: SnackBarBehavior.floating,
+        margin: EdgeInsets.all(5),
+        duration: Duration(seconds: 5),
+      ),
+    );
   }
 
   void _handleExternalWallet(ExternalWalletResponse response) {
@@ -824,117 +853,121 @@ class _PaymentScreenState extends State<PaymentScreen> {
     }
   }
 
-Future<void> storeAMCDataInFirestore(String uid) async {
-  // Call the amcorderdetail method to get the order details
-  Map<String, dynamic> orderDetails = amcorderdetail();
+  Future<void> storeAMCDataInFirestore(String uid) async {
+    // Call the amcorderdetail method to get the order details
+    Map<String, dynamic> orderDetails = amcorderdetail();
 
-  // Construct the Firestore path
-  String firestorePath = 'Users/$uid/AMC Subscription';
-  Uuid uuid = Uuid();
+    // Construct the Firestore path
+    String firestorePath = 'Users/$uid/AMC Subscription';
+    Uuid uuid = Uuid();
 
-  // Iterate through the 'AMC' map in orderDetails
-  for (var entry in orderDetails['AMC'].entries) {
-    String productId = entry.key;
-    Map<String, dynamic> productData = entry.value;
-    int count = productData['count'];
+    // Iterate through the 'AMC' map in orderDetails
+    for (var entry in orderDetails['AMC'].entries) {
+      String productId = entry.key;
+      Map<String, dynamic> productData = entry.value;
+      int count = productData['count'];
 
-    // Create a new document under the productId
-    DocumentReference productRef =
-        FirebaseFirestore.instance.collection(firestorePath).doc(productId);
+      // Create a new document under the productId
+      DocumentReference productRef =
+          FirebaseFirestore.instance.collection(firestorePath).doc(productId);
 
-    // Iterate through the count to generate unique IDs
-    for (int i = 0; i < count; i++) {
-      String randomId = uuid.v4();
-      DateTime currentTimestamp = DateTime.now();
+      // Iterate through the count to generate unique IDs
+      for (int i = 0; i < count; i++) {
+        String randomId = uuid.v4();
+        DateTime currentTimestamp = DateTime.now();
 
-      // Calculate service intervals and build data map
-      Map<String, dynamic> dataToMerge = {
-        'Benefits': productData['benefits'],
-        'Images': productData['images'],
-        'SparesIncluded': productData['SparesIncluded'],
-        'SparesBenefits': productData['SparesBenefits'],
-        'Claimed1': false,
-        'Claimed2': false,
-        'Claimed3': false,
-        'Claimed4': false,
-        'Avail': true,
-      };
-
-      // Define the service intervals (1, 2, 3 months)
-      List<int> serviceIntervals = [0, 4, 8, 12];
-
-      for (int interval in serviceIntervals) {
-        DateTime serviceTimestamp = addMonths(currentTimestamp, interval);
-        dataToMerge['Service$interval'] = {
-          'Timestamp': serviceTimestamp,
-          'IsDone': false
+        // Calculate service intervals and build data map
+        Map<String, dynamic> dataToMerge = {
+          'Benefits': productData['benefits'],
+          'Images': productData['images'],
+          'SparesIncluded': productData['SparesIncluded'],
+          'SparesBenefits': productData['SparesBenefits'],
+          'Claimed1': false,
+          'Claimed2': false,
+          'Claimed3': false,
+          'Claimed4': false,
+          'Avail': true,
         };
+
+        // Define the service intervals (1, 2, 3 months)
+        List<int> serviceIntervals = [0, 4, 8, 12];
+
+        for (int interval in serviceIntervals) {
+          DateTime serviceTimestamp = addMonths(currentTimestamp, interval);
+          dataToMerge['Service$interval'] = {
+            'Timestamp': serviceTimestamp,
+            'IsDone': false
+          };
+        }
+
+        // Create a map with the randomId as key
+        Map<String, dynamic> dataToMergeWithId = {randomId: dataToMerge};
+
+        // Use set with merge option to add or update the data
+        await productRef.set(
+            {"SchemeCollection": dataToMergeWithId}, SetOptions(merge: true));
+
+        // Call storeAMCDataInadmin for each product
+        await storeAMCDataInadmin(
+            uid, name, contact, address, productId, randomId, productData);
       }
 
-      // Create a map with the randomId as key
-      Map<String, dynamic> dataToMergeWithId = {randomId: dataToMerge};
+      // Set product title
+      await productRef
+          .set({'title': productData['title']}, SetOptions(merge: true));
+    }
+  }
 
-      // Use set with merge option to add or update the data
-      await productRef.set(
-          {"SchemeCollection": dataToMergeWithId}, SetOptions(merge: true));
-      
-      // Call storeAMCDataInadmin for each product
-      await storeAMCDataInadmin(
-          uid, name, contact, address, productId, randomId, productData);
+  Future<void> storeAMCDataInadmin(
+      String uid,
+      String name,
+      String contact,
+      String address,
+      String productId,
+      String randomId,
+      Map<String, dynamic> productData) async {
+    // Construct the Firestore path
+    String firestorePath = 'CurrentAMCSubscription';
+
+    // Create a new document for each product
+    DocumentReference productRef =
+        FirebaseFirestore.instance.collection(firestorePath).doc('$randomId');
+
+    DateTime currentTimestamp = DateTime.now();
+
+    // Calculate service intervals and build data map
+    Map<String, dynamic> dataToMerge = {
+      'Benefits': productData['benefits'],
+      'Images': productData['images'],
+      'SparesIncluded': productData['SparesIncluded'],
+      'SparesBenefits': productData['SparesBenefits'],
+      'Claimed': false,
+      'Name': name,
+      'Contact': contact,
+      'Address': address,
+      'Avail': true,
+      'Image': '',
+      'Title': productData['title'],
+      'UID': uid,
+    };
+
+    // Define the service intervals (1, 2, 3 months)
+    List<int> serviceIntervals = [0, 4, 8, 12];
+
+    for (int interval in serviceIntervals) {
+      DateTime serviceTimestamp = addMonths(currentTimestamp, interval);
+      dataToMerge['Service$interval'] = {
+        'Timestamp': serviceTimestamp,
+        'IsDone': false
+      };
     }
 
     // Set product title
-    await productRef
-        .set({'title': productData['title']}, SetOptions(merge: true));
+    dataToMerge['title'] = productData['title'];
+
+    // Use set to add the data
+    await productRef.set(dataToMerge);
   }
-}
-
-Future<void> storeAMCDataInadmin(
-    String uid, String name, String contact, String address, String productId, String randomId, Map<String, dynamic> productData) async {
-  // Construct the Firestore path
-  String firestorePath = 'CurrentAMCSubscription';
-
-  // Create a new document for each product
-  DocumentReference productRef = FirebaseFirestore.instance
-      .collection(firestorePath)
-      .doc('$randomId');
-
-  DateTime currentTimestamp = DateTime.now();
-
-  // Calculate service intervals and build data map
-  Map<String, dynamic> dataToMerge = {
-    'Benefits': productData['benefits'],
-    'Images': productData['images'],
-    'SparesIncluded': productData['SparesIncluded'],
-    'SparesBenefits': productData['SparesBenefits'],
-    'Claimed': false,
-    'Name': name,
-    'Contact': contact,
-    'Address': address,
-    'Avail': true,
-    'Image':'',
-    'Title': productData['title'],
-    'UID': uid,
-  };
-
-  // Define the service intervals (1, 2, 3 months)
-  List<int> serviceIntervals = [0, 4, 8, 12];
-
-  for (int interval in serviceIntervals) {
-    DateTime serviceTimestamp = addMonths(currentTimestamp, interval);
-    dataToMerge['Service$interval'] = {
-      'Timestamp': serviceTimestamp,
-      'IsDone': false
-    };
-  }
-
-  // Set product title
-  dataToMerge['title'] = productData['title'];
-
-  // Use set to add the data
-  await productRef.set(dataToMerge);
-}
-
 
   DateTime addMonths(DateTime dateTime, int months) {
     return DateTime(

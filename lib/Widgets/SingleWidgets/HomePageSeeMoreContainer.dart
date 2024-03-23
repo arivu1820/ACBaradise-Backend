@@ -1,5 +1,6 @@
 import 'package:acbaradise/Theme/Colors.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 class HomePageSeeMoreContainer extends StatelessWidget {
   const HomePageSeeMoreContainer({super.key});
@@ -29,16 +30,13 @@ class HomePageSeeMoreContainer extends StatelessWidget {
         children: [
           Padding(
             padding: const EdgeInsets.only(top: 10, left: 15, right: 15),
-            child: FittedBox(
-              fit: BoxFit.contain,
-              child: Text(
-                "See more",
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontFamily: "OxygenBold",
-                  fontSize: 14,
-                  color: blackColor,
-                ),
+            child: Text(
+              "See more",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontFamily: "OxygenBold",
+                fontSize: 13,
+                color: blackColor,
               ),
             ),
           ),

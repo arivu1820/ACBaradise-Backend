@@ -22,7 +22,7 @@ class _AutoImageSliderState extends State<AutoImageSlider> {
           borderRadius: BorderRadius.circular(8),
           image: DecorationImage(
             image: NetworkImage(imageUrl),
-            fit: BoxFit.cover,
+            fit: BoxFit.contain,
           ),
         ),
       );
@@ -92,23 +92,26 @@ class _AutoImageSliderState extends State<AutoImageSlider> {
     return Column(
       children: [
         CarouselSlider(
-          items: generateImageContainers(imageUrls),
-          options: CarouselOptions(
-            height: 250.0,
-            enlargeCenterPage: true,
-            autoPlay: false,
-            aspectRatio: 16 / 9,
-            autoPlayCurve: Curves.fastOutSlowIn,
-            enableInfiniteScroll: true,
-            autoPlayAnimationDuration: Duration(seconds: 1),
-            viewportFraction: 1,
-            onPageChanged: (index, _) {
-              setState(() {
-                activePage = index;
-              });
-            },
-          ),
-        ),
+  items: generateImageContainers(imageUrls),
+  options: CarouselOptions(
+    height: 250.0,
+    enlargeCenterPage: true,
+    autoPlay: false,
+    aspectRatio: 16 / 9,
+    autoPlayCurve: Curves.fastOutSlowIn,
+    enableInfiniteScroll: true,
+    autoPlayAnimationDuration: Duration(seconds: 1),
+    viewportFraction: 1,
+    onPageChanged: (index, _) {
+      setState(() {
+        activePage = index;
+      });
+    },
+  ),
+)
+
+// Function to generate Image Containers
+,
         Padding(
           padding: const EdgeInsets.all(8.0),
           child: imageIndicator(imageUrls.length),
@@ -116,5 +119,7 @@ class _AutoImageSliderState extends State<AutoImageSlider> {
       ],
     );
   }
+
+
 }
 
