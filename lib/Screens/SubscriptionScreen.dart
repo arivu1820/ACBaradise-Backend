@@ -11,8 +11,7 @@ class SubscriptionScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-            backgroundColor: whiteColor,
-
+      backgroundColor: whiteColor,
       appBar: AppbarWithCart(
         PageName: "Annual Contract Subscription",
         iscart: true,
@@ -26,13 +25,20 @@ class SubscriptionScreen extends StatelessWidget {
                   .collection('Users')
                   .doc(uid)
                   .collection('AMC Subscription')
+                  
                   .snapshots(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(child: Column(
+                  return Center(
+                      child: Column(
                     children: [
-                      const SizedBox(height: 30,),
-                      CircularProgressIndicator(color: darkBlueColor,strokeWidth: 2,),
+                      const SizedBox(
+                        height: 30,
+                      ),
+                      CircularProgressIndicator(
+                        color: darkBlueColor,
+                        strokeWidth: 2,
+                      ),
                     ],
                   )); // or any loading indicator
                 }
@@ -43,7 +49,10 @@ class SubscriptionScreen extends StatelessWidget {
 
                 // If the data is not available, you can show a placeholder
                 if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                  return Center(child: Expanded(child: Text('Purchase a subscription for unlimited features for your AC')));
+                  return Center(
+                      child: Expanded(
+                          child: Text(
+                              'Purchase a subscription for unlimited features for your AC')));
                 }
 
                 // If data is available, use ListView.builder
@@ -58,7 +67,9 @@ class SubscriptionScreen extends StatelessWidget {
               },
             ),
           ),
-          const SizedBox(height: 30,)
+          const SizedBox(
+            height: 30,
+          )
         ],
       ),
     );

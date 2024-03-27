@@ -63,8 +63,69 @@ class _AddAddressDetailsScreenState extends State<AddAddressDetailsScreen> {
   Future<void> requestLocationPermission() async {
     PermissionStatus _permissionGranted =
         await _locationController.hasPermission();
+
     if (_permissionGranted == PermissionStatus.denied) {
-      _permissionGranted = await _locationController.requestPermission();
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Center(child: Text('Location Permission Needed')),
+          content: IntrinsicHeight(
+            child: Container(
+              child: Column(
+                children: [
+                  Text(
+                    'To provide the best service and deliver your orders accurately, our app requires access to your location.',
+                    style: TextStyle(
+                        color: blackColor,
+                        fontFamily: 'LexendRegular',
+                        fontSize: 14),
+                  ),
+                  SizedBox(height: 8), // Add some spacing between the bullet points
+                  Text(
+                    '• Your location helps us locate delivery addresses precisely.',
+                    style: TextStyle(
+                        color: black90Color,
+                        fontFamily: 'LexendRegular',
+                        fontSize: 12),
+                  ),
+                  Text(
+                    '• We utilize your location to enhance your experience and offer personalized services.',
+                    style: TextStyle(
+                        color: black90Color,
+                        fontFamily: 'LexendRegular',
+                        fontSize: 12),
+                  ),
+                  Text(
+                    '• Rest assured, we do not share your location with third parties.',
+                    style: TextStyle(
+                        color: black90Color,
+                        fontFamily: 'LexendRegular',
+                        fontSize: 12),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+                Navigator.pop(context);
+              },
+              child: Text('Deny'),
+            ),
+            TextButton(
+              onPressed: () async {
+                _permissionGranted =
+                    await _locationController.requestPermission();
+                Navigator.pop(context);
+                // Handle permission granted or denied further
+              },
+              child: Text('Grant Permission'),
+            ),
+          ],
+        ),
+      );
       if (_permissionGranted != PermissionStatus.granted) {
         print("Location permission is not granted.");
         return;

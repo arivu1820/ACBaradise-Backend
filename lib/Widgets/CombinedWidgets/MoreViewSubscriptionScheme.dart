@@ -63,15 +63,20 @@ class MoreViewSubscriptionScheme extends StatelessWidget {
     bool showServiceClaim = false;
 
     // Check if any of the service timestamps fall within the current month
-    if ((service1Timestamp.toDate().month == now.month && service1Timestamp.toDate().year == now.year && !Claimed1) ||
-    (service2Timestamp.toDate().month == now.month && service2Timestamp.toDate().year == now.year && !Claimed2) ||
-    (service3Timestamp.toDate().month == now.month && service3Timestamp.toDate().year == now.year && !Claimed3) ||
-    (service4Timestamp.toDate().month == now.month && service4Timestamp.toDate().year == now.year && !Claimed4)
-    
-    ) {
-  showServiceClaim = true;
-}
-
+    if ((service1Timestamp.toDate().month == now.month &&
+            service1Timestamp.toDate().year == now.year &&
+            !Claimed1) ||
+        (service2Timestamp.toDate().month == now.month &&
+            service2Timestamp.toDate().year == now.year &&
+            !Claimed2) ||
+        (service3Timestamp.toDate().month == now.month &&
+            service3Timestamp.toDate().year == now.year &&
+            !Claimed3) ||
+        (service4Timestamp.toDate().month == now.month &&
+            service4Timestamp.toDate().year == now.year &&
+            !Claimed4)) {
+      showServiceClaim = true;
+    }
 
     return Container(
       decoration: BoxDecoration(
@@ -184,13 +189,13 @@ class MoreViewSubscriptionScheme extends StatelessWidget {
                   ? SizedBox()
                   : showServiceClaim
                       ? ServiceClaim(
-                          checkfunction: ()=> checkfunction(context),
+                          checkfunction: () => checkfunction(context),
                         )
                       : SizedBox(),
               smallscreenwidth
                   ? showServiceClaim
                       ? ServiceClaim(
-                          checkfunction: ()=> checkfunction(context),
+                          checkfunction: () => checkfunction(context),
                         )
                       : SizedBox()
                   : SizedBox()
@@ -203,11 +208,9 @@ class MoreViewSubscriptionScheme extends StatelessWidget {
 
   void checkfunction(BuildContext context) {
     if (service1Timestamp.toDate().month == now.month) {
-
       // Update Service1 timestamp
       updateServiceTimestamp(docid, 'Service0');
-          showServiceClaimDialog(context); // Call the dialog function here
-
+      showServiceClaimDialog(context); // Call the dialog function here
     } else if (service2Timestamp.toDate().month == now.month) {
       // Update Service2 timestamp
       updateServiceTimestamp(docid, 'Service4');
@@ -220,77 +223,73 @@ class MoreViewSubscriptionScheme extends StatelessWidget {
     }
   }
 
-
-
-void showServiceClaimDialog(BuildContext context) {
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        backgroundColor: leghtGreen,
-
-        content: SizedBox(
-          height: 200,
-          child: Center(
-            child: CircularProgressIndicator(
-              strokeWidth: 2,
-              valueColor: AlwaysStoppedAnimation<Color>(whiteColor),
-            ),
-          ),
-        ),
-      );
-    },
-  );
-
-  // Delay for 2 seconds
-  Timer(Duration(seconds: 2), () {
-    Navigator.of(context).pop(); // Close the loading dialog
-    showContentDialog(context); // Show the content dialog
-  });
-}
-
-void showContentDialog(BuildContext context) {
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        backgroundColor: leghtGreen,
-        title: Text(
-          "Service Claim",
-          style: TextStyle(
-            fontFamily: 'LexendRegular',
-            color: whiteColor,
-            fontSize: 18,
-          ),
-        ),
-        content: Text(
-          "Your service has been claimed. We will contact you soon. For more detais cotact ",
-          style: TextStyle(
-            fontFamily: 'LexendRegular',
-            color: whiteColor,
-            fontSize: 14,
-          ),
-        ),
-        actions: <Widget>[
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop(); // Close the dialog
-            },
-            child: Text(
-              "OK",
-              style: TextStyle(
-                fontFamily: 'LexendRegular',
-                color: whiteColor,
-                fontSize: 18,
+  void showServiceClaimDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: leghtGreen,
+          content: SizedBox(
+            height: 200,
+            child: Center(
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                valueColor: AlwaysStoppedAnimation<Color>(whiteColor),
               ),
             ),
           ),
-        ],
-      );
-    },
-  );
-}
+        );
+      },
+    );
 
+    // Delay for 2 seconds
+    Timer(Duration(seconds: 2), () {
+      Navigator.of(context).pop(); // Close the loading dialog
+      showContentDialog(context); // Show the content dialog
+    });
+  }
+
+  void showContentDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: leghtGreen,
+          title: Text(
+            "Service Claim",
+            style: TextStyle(
+              fontFamily: 'LexendRegular',
+              color: whiteColor,
+              fontSize: 18,
+            ),
+          ),
+          content: Text(
+            "Your service has been claimed. We will contact you soon. For more detail contact help line. ",
+            style: TextStyle(
+              fontFamily: 'LexendRegular',
+              color: whiteColor,
+              fontSize: 14,
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: Text(
+                "OK",
+                style: TextStyle(
+                  fontFamily: 'LexendRegular',
+                  color: whiteColor,
+                  fontSize: 18,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   // Function to update the service timestamp in Firestore
   Future<void> updateServiceTimestamp(String docId, String serviceField) async {
@@ -300,7 +299,8 @@ void showContentDialog(BuildContext context) {
           .collection('CurrentAMCSubscription')
           .doc(id)
           .set({
-        serviceField: {'Timestamp': Timestamp.now()}
+        serviceField: {'Timestamp': Timestamp.now()},
+        'Claimed': true, // Set Claimed to true outside the serviceField
       }, SetOptions(merge: true));
       print(docId);
 

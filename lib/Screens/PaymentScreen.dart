@@ -134,8 +134,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                 style: TextStyle(
                   color: whiteColor,
                   decoration: TextDecoration.underline,
-                            decorationColor: whiteColor,
-
+                  decorationColor: whiteColor,
                 ),
               ),
               Text(
@@ -878,6 +877,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
 
         // Calculate service intervals and build data map
         Map<String, dynamic> dataToMerge = {
+          'CreatedAt': DateTime.now(),
           'Benefits': productData['benefits'],
           'Images': productData['images'],
           'SparesIncluded': productData['SparesIncluded'],
@@ -913,8 +913,9 @@ class _PaymentScreenState extends State<PaymentScreen> {
       }
 
       // Set product title
-      await productRef
-          .set({'title': productData['title']}, SetOptions(merge: true));
+      await productRef.set({
+        'title': productData['title'],
+      }, SetOptions(merge: true));
     }
   }
 
@@ -946,9 +947,11 @@ class _PaymentScreenState extends State<PaymentScreen> {
       'Contact': contact,
       'Address': address,
       'Avail': true,
-      'Image': '',
+      'Image':'',
       'Title': productData['title'],
       'UID': uid,
+      'lat': latitude,
+      'lon': longitude,
     };
 
     // Define the service intervals (1, 2, 3 months)

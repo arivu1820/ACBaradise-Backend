@@ -143,7 +143,25 @@ class _SubscriptionSchemeState extends State<SubscriptionScheme> {
                           widget.document['SchemeCollection']?.keys.toList() ??
                               [];
 
-                      // Get the current key based on the index
+                      // Sort schemeKeys based on timestamps
+                      schemeKeys.sort((a, b) {
+                        Map<String, dynamic>? schemeDataA =
+                            widget.document['SchemeCollection']?[a];
+                        Map<String, dynamic>? schemeDataB =
+                            widget.document['SchemeCollection']?[b];
+
+                        // Get timestamps from schemeDataA and schemeDataB
+                        DateTime timestampA =
+                            schemeDataA?['CreatedAt']?.toDate() ?? DateTime(0);
+                        DateTime timestampB =
+                            schemeDataB?['CreatedAt']?.toDate() ?? DateTime(0);
+
+                        // Compare timestamps for sorting
+                        return timestampA.compareTo(
+                            timestampB); // Sorting in ascending order
+                      });
+
+                      // Get the current key based on the sorted schemeKeys and index
                       String currentKey =
                           schemeKeys.length > index ? schemeKeys[index] : '';
 

@@ -253,7 +253,7 @@ Future<void> checkProductInCart() async {
                       },
                 child: isProductInCart
                     ? GestureDetector(
-                        onTap: () => Navigator.push(
+                        onTap: () => Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
                             builder: (context) => MyCartScreen(uid: widget.uid),

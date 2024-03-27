@@ -36,6 +36,7 @@ class GoogleSigninBtn extends StatelessWidget {
               return Center(
                 child: CircularProgressIndicator(
                   color: darkBlueColor,
+                  strokeWidth: 2,
                 ),
               );
             });
