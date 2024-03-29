@@ -79,6 +79,7 @@ class DrawerWidget extends StatelessWidget {
                         const SizedBox(
                           width: 20,
                         ),
+                        
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
